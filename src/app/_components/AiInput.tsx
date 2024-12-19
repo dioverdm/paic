@@ -159,7 +159,7 @@ export default function AIInput_10() {
     // Set up interval to update messages every 100ms
     const intervalId = setInterval(() => {
       setMessages(messages);
-    }, 100);
+    }, 10);
 
     // Clean up interval on unmount
     return () => clearInterval(intervalId);
