@@ -156,10 +156,10 @@ export default function AIInput_10() {
   };
 
   useEffect(() => {
-    // Set up interval to update messages every 100ms
+    // Set up interval to update messages every 50ms
     const intervalId = setInterval(() => {
       setMessages(messages);
-    }, 10);
+    }, 50);
 
     // Clean up interval on unmount
     return () => clearInterval(intervalId);
