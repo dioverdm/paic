@@ -49,19 +49,19 @@ export default function Intro() {
         className="flex flex-col md:flex-row gap-4 w-full max-w-[90%] md:max-w-none"
       >
         <FeatureCard
-          icon="✨"
-          title="Smart AI"
-          description="Powered by advanced AI to provide intelligent responses"
+          icon="🔒"
+          title="Privacy First"
+          description="Your conversations and data are fully encrypted and private"
         />
         <FeatureCard
-          icon="🚀"
-          title="Fast"
-          description="Get instant answers to your questions"
+          icon="🖼️"
+          title="Multimodal"
+          description="Chat with text, images, files and more seamlessly"
         />
         <FeatureCard
-          icon="🛠️"
-          title="Versatile"
-          description="Help with coding, analysis, and more"
+          icon="💰"
+          title="Cost Effective"
+          description="Get powerful AI assistance at budget-friendly rates"
         />
       </motion.div>
     </motion.div>

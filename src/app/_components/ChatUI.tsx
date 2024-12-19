@@ -29,7 +29,7 @@ export default function ChatUI() {
       })}
     >
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="w-full mx-auto space-y-6">
           {visibleMessages.map((message) => (
             <MessageItem key={message.id} message={message} />
           ))}

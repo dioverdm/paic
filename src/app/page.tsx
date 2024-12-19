@@ -5,7 +5,7 @@ import ChatInterfaceMain from "./_components/ChatInterfaceMain";
 export default function page() {
   return (
     <div className="flex-1 flex justify-center">
-      <div className="max-w-3xl flex-1 flex flex-col gap-6 justify-between relative">
+      <div className="max-w-4xl flex-1 flex flex-col gap-6 justify-between relative">
         <div></div>
         <ChatInterfaceMain />
         <div className="sticky bottom-4">
