@@ -10,7 +10,7 @@ export default function Intro() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="flex flex-col gap-6 md:gap-8 items-center text-center pt-8 md:pt-12 px-4 relative"
+      className="flex flex-col gap-6 md:gap-8 items-center text-center pt-8 md:pt-12 px-4 relative min-h-[70vh]"
     >
       {/* <BackgroundGrid /> */}
 
