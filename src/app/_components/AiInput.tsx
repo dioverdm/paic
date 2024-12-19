@@ -9,12 +9,12 @@ import {
   Brain,
   Lock,
   Unlock,
+  StopCircleIcon,
 } from "lucide-react";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
-import { useFileInput } from "@/hooks/use-file-input";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import {
   Select,
@@ -91,7 +91,12 @@ const FileDisplay = ({
 }) => (
   <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 w-fit px-3 py-1 rounded-lg">
     <File className="w-4 h-4 dark:text-white" />
-    <span className="text-sm dark:text-white">{fileName}</span>
+    <span
+      title={fileName}
+      className="text-sm dark:text-white truncate max-w-20"
+    >
+      {fileName}
+    </span>
     <button
       type="button"
       onClick={onClear}
@@ -105,10 +110,11 @@ const FileDisplay = ({
 export default function AIInput_10() {
   const menuRef = useRef<HTMLDivElement & HTMLElement>(null);
   const { setMessages } = useMessages();
-  const { messages, handleInputChange, handleSubmit } = useChat({
-    api: "/api/chat",
-    credentials: "include",
-  });
+  const { messages, handleInputChange, handleSubmit, isLoading, stop } =
+    useChat({
+      api: "/api/chat",
+      credentials: "include",
+    });
 
   const [state, setState] = useState({
     value: "",
@@ -123,14 +129,8 @@ export default function AIInput_10() {
     minHeight: MIN_HEIGHT,
     maxHeight: 200,
   });
-  const {
-    // fileName,
-    fileInputRef,
-    // handleFileSelect, clearFile
-  } = useFileInput({
-    accept: "image/*",
-    maxSize: 5,
-  });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [files, setFiles] = useState<FileList | undefined>();
 
   const updateState = useCallback(
     (updates: Partial<typeof state>) =>
@@ -146,8 +146,11 @@ export default function AIInput_10() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      handleSubmit(e, {
+        experimental_attachments: files,
+      });
       updateState({ value: "" });
+      setFiles(undefined);
       adjustHeight(true);
     }
   };
@@ -163,7 +166,14 @@ export default function AIInput_10() {
   }, [messages, setMessages]);
 
   return (
-    <form className="w-full py-4" onSubmit={handleSubmit}>
+    <form
+      className="w-full py-4"
+      onSubmit={(e) =>
+        handleSubmit(e, {
+          experimental_attachments: files,
+        })
+      }
+    >
       <div className="rounded-xl bg-sidebar">
         <div ref={menuRef}>
           <div className="border-b border-black/10 dark:border-white/10">
@@ -227,17 +237,31 @@ export default function AIInput_10() {
             </div>
           </div>
 
-          {state.fileName && (
-            <div className="px-4 pt-2">
-              <FileDisplay
-                fileName={state.fileName}
-                onClear={() => {
-                  updateState({ fileName: "" });
-                  if (fileInputRef.current) fileInputRef.current.value = "";
-                }}
-              />
+          {files && (
+            <div className="px-4 pt-2 flex gap-2 overflow-x-auto">
+              {Array.from(files).map((file) => (
+                <FileDisplay
+                  key={file.name}
+                  fileName={file.name}
+                  onClear={() => setFiles(undefined)}
+                />
+              ))}
             </div>
           )}
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={() => {
+              if (fileInputRef.current?.files) {
+                setFiles(fileInputRef.current.files);
+              }
+            }}
+            multiple
+            // only image
+            accept="image/*"
+            hidden
+          />
 
           <div className="relative px-2 py-2">
             <div
@@ -295,17 +319,29 @@ export default function AIInput_10() {
               }}
             />
 
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl bg-black/5 dark:bg-white/5 p-1"
-            >
-              <ArrowRight
-                className={cn(
-                  "w-4 h-4 dark:text-white",
-                  state.value ? "opacity-100" : "opacity-30"
-                )}
-              />
-            </button>
+            {isLoading ? (
+              <button
+                type="button"
+                onClick={stop}
+                title="Stop"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl bg-black/5 dark:bg-white/5 p-1"
+              >
+                <StopCircleIcon className={cn("w-4 h-4 dark:text-white")} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl bg-black/5 dark:bg-white/5 p-1"
+                title="Send"
+              >
+                <ArrowRight
+                  className={cn(
+                    "w-4 h-4 dark:text-white",
+                    state.value ? "opacity-100" : "opacity-30"
+                  )}
+                />
+              </button>
+            )}
           </div>
         </div>
       </div>
