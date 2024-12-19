@@ -10,7 +10,7 @@ import {
   Lock,
   Unlock,
 } from "lucide-react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
@@ -29,6 +29,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useChat } from "ai/react";
+import useMessages from "@/hooks/use-messages";
 
 const AI_MODELS = [
   {
@@ -102,6 +104,11 @@ const FileDisplay = ({
 
 export default function AIInput_10() {
   const menuRef = useRef<HTMLDivElement & HTMLElement>(null);
+  const { setMessages } = useMessages();
+  const { messages, handleInputChange, handleSubmit } = useChat({
+    api: "/api/chat",
+    credentials: "include",
+  });
 
   const [state, setState] = useState({
     value: "",
@@ -116,7 +123,11 @@ export default function AIInput_10() {
     minHeight: MIN_HEIGHT,
     maxHeight: 200,
   });
-  const { fileName, fileInputRef, handleFileSelect, clearFile } = useFileInput({
+  const {
+    // fileName,
+    fileInputRef,
+    // handleFileSelect, clearFile
+  } = useFileInput({
     accept: "image/*",
     maxSize: 5,
   });
@@ -135,14 +146,25 @@ export default function AIInput_10() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      handleSubmit(e);
       updateState({ value: "" });
       adjustHeight(true);
     }
   };
 
+  useEffect(() => {
+    // Set up interval to update messages every 100ms
+    const intervalId = setInterval(() => {
+      setMessages(messages);
+    }, 100);
+
+    // Clean up interval on unmount
+    return () => clearInterval(intervalId);
+  }, [messages, setMessages]);
+
   return (
-    <div className="w-full py-4">
-      <div className="rounded-xl bg-black/5 dark:bg-white/5">
+    <form className="w-full py-4" onSubmit={handleSubmit}>
+      <div className="rounded-xl bg-sidebar">
         <div ref={menuRef}>
           <div className="border-b border-black/10 dark:border-white/10">
             <div className="flex justify-between items-center px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400">
@@ -268,6 +290,7 @@ export default function AIInput_10() {
               onKeyDown={handleKeyDown}
               onChange={(e) => {
                 updateState({ value: e.target.value });
+                handleInputChange(e);
                 adjustHeight();
               }}
             />
@@ -286,6 +309,6 @@ export default function AIInput_10() {
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
