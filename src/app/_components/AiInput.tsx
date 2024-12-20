@@ -36,48 +36,57 @@ import { useChat as useChatStore } from "@/hooks/use-chat";
 const AI_MODELS = [
   {
     name: "OpenAI: GPT-4o",
-    value: "openai/gpt-4o-2024-11-20",
+    value: "gpt-4o",
     description: "Ultimate brain for complex tasks",
+    provider: "openai",
   },
   {
     name: "OpenAI: GPT-4 Turbo",
-    value: "openai/gpt-4-turbo",
+    value: "gpt-4-turbo",
     description: "Fast and highly intelligent",
+    provider: "openai",
   },
   {
     name: "OpenAI: GPT-3.5 Turbo",
-    value: "openai/gpt-3.5-turbo",
+    value: "gpt-3.5-turbo",
     description: "Quick reliable general assistant",
+    provider: "openai",
   },
   {
     name: "OpenAI: GPT-4o-mini",
-    value: "openai/gpt-4o-mini",
+    value: "gpt-4o-mini",
     description: "Smart everyday task helper",
+    provider: "openai",
   },
   {
     name: "Anthropic: Claude 3.5 Sonnet",
-    value: "anthropic/claude-3.5-sonnet",
+    value: "claude-3-5-sonnet-latest",
     description: "Expert code wizard master",
+    provider: "anthropic",
   },
   {
     name: "Anthropic: Claude 3 Haiku",
-    value: "anthropic/claude-3-haiku",
+    value: "claude-3-5-haiku-latest",
     description: "Swift coding problem solver",
+    provider: "anthropic",
   },
   {
     name: "Anthropic: Claude 3 Opus",
-    value: "anthropic/claude-3-opus",
+    value: "claude-3-5-opus-latest",
     description: "Supreme intelligence master model",
+    provider: "anthropic",
   },
   {
     name: "Google: Gemini 1.5 Flash-8B",
     value: "google/gemini-flash-1.5-8b",
     description: "Lightning fast Google AI",
+    provider: "openrouter",
   },
   {
-    name: "Meta: Llama 3.1 8B Instruct",
-    value: "meta-llama/llama-3.1-8b-instruct",
+    name: "Meta: Llama 3.3 70B Instruct",
+    value: "meta-llama/llama-3.3-70b-instruct",
     description: "Open source AI champion",
+    provider: "openrouter",
   },
 ].map((model) => ({ ...model, icon: <Brain className="w-4 h-4" /> }));
 
@@ -113,7 +122,16 @@ export default function AIInput_10() {
   const { setMessages } = useMessages();
   const { createChat, updateChat, getChat } = useChatStore();
   const [runInitialChat, setRunInitialChat] = useState(false);
+  const [updateChatLoading, setUpdateChatLoading] = useState(false);
   const [init, setInit] = useState(false);
+  const [state, setState] = useState({
+    value: "",
+    fileName: "",
+    isPrivacyMode: false,
+    selectedModel: "OpenAI: GPT-4o",
+    isMenuOpen: false,
+    isModelMenuOpen: false,
+  });
   const router = useRouter();
   const params = useParams();
   const chatId = params.id;
@@ -131,30 +149,63 @@ export default function AIInput_10() {
       if (!chatId && messages.length < 3) {
         setRunInitialChat(true);
       } else {
-        updateChat(chatId as string, messages);
+        setUpdateChatLoading(true);
       }
+    },
+    body: {
+      provider: AI_MODELS.find((model) => model.name === state.selectedModel)
+        ?.provider,
+      model: AI_MODELS.find((model) => model.name === state.selectedModel)
+        ?.value,
     },
   });
 
   useEffect(() => {
+    if (updateChatLoading && !isLoading) {
+      updateChat(chatId as string, messages);
+      setUpdateChatLoading(false);
+    }
+  }, [updateChatLoading, chatId, messages, updateChat, isLoading]);
+
+  useEffect(() => {
     if (runInitialChat && !isLoading) {
-      // setTimeout(() => {
-      const chatId = createChat(messages[0].content);
-      updateChat(chatId, messages);
-      router.push(`/c/${chatId}`);
-      setRunInitialChat(false);
-      // }, 1000);
+      const getTitleAndCreateChat = async () => {
+        try {
+          // Get title suggestion from API using messages
+          const response = await fetch("/api/completion", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              messages: messages.slice(0, 2), // Send first two messages for context
+            }),
+          });
+
+          const { title = "New Chat", error } = await response.json();
+
+          if (error) {
+            throw new Error(error);
+          }
+
+          // Create chat with generated title
+          const chatId = createChat(title);
+          updateChat(chatId, messages);
+          router.push(`/c/${chatId}`);
+        } catch (error) {
+          console.error("Failed to generate title:", error);
+          // Fallback to creating chat without custom title
+          const chatId = createChat(messages[0].content);
+          updateChat(chatId, messages);
+          router.push(`/c/${chatId}`);
+        } finally {
+          setRunInitialChat(false);
+        }
+      };
+
+      getTitleAndCreateChat();
     }
   }, [createChat, isLoading, messages, runInitialChat, updateChat, router]);
-
-  const [state, setState] = useState({
-    value: "",
-    fileName: "",
-    isPrivacyMode: false,
-    selectedModel: "OpenAI: GPT-4o",
-    isMenuOpen: false,
-    isModelMenuOpen: false,
-  });
 
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: MIN_HEIGHT,
@@ -371,7 +422,7 @@ export default function AIInput_10() {
               </button>
             ) : (
               <button
-                type="button"
+                type="submit"
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl bg-black/5 dark:bg-white/5 p-1"
                 title="Send"
               >

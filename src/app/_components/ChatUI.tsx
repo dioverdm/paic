@@ -26,7 +26,9 @@ export default function ChatUI() {
       <div className="flex-1 overflow-y-auto">
         <div className="w-full mx-auto space-y-6">
           {messages?.map((message) => (
-            <MessageItem key={message.id} message={message} />
+            <div key={message.id}>
+              <MessageItem key={message.id} message={message} />
+            </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
