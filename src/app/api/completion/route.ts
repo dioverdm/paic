@@ -38,27 +38,38 @@ export async function POST(req: Request): Promise<NextResponse> {
     }
 
     // Construct the refined prompt for the AI
-    const prompt = `
-You are an AI assistant that creates concise, straightforward titles for chat interactions. Based on the following two messages, generate a title that represents the start of the conversation in a simple, professional, and friendly manner. The title should focus on summarizing the assistant’s initial response or the main request from the user.
+    const system = `
+You are an AI assistant designed to generate concise, straightforward titles that accurately represent the start of a conversation based on user and assistant messages. Your task is to formulate a title that captures the user's main request and the assistant's initial response.
 
-Here are the messages:
+Steps:
+1. Assess the user's first message to understand the primary request or query.
+2. Consider the assistant's response to grasp the key elements of the reply.
+3. Create a title that succinctly reflects the interaction's main focus.
 
-1. User: "${messages[0].content}"
-2. Assistant: "${messages[1].content}"
+Output Format:
+- The title should be clear, direct, and relevant to the conversation's essence.
+- Avoid additional words, prefixes, or formatting.
+- Focus strictly on encapsulating the main topic or objective of the exchange.
 
-The title should be:
-- Simple and direct.
-- Avoid any prefixes like "Ready to Help" or "How Can I Assist."
-- Focus on the core question or statement.
-- Do not include any additional words or formatting.
+Examples:
+Example Input:
+1. User: "I need help with my project."
+2. Assistant: "Sure, I can assist you with your project. What do you need help with specifically?"
+Output Title: "Help Requested for Project"
 
-Just return the title, nothing else.
+Example Input:
+1. User: "How do I reset my password?"
+2. Assistant: "You can reset your password through the account settings page."
+Output Title: "Password Reset Inquiry"
+
+Note: Simply return the generated title, directly relating to the initial conversation's content.
     `;
 
     // Generate the title using the AI model
     const { text } = await generateText({
       model: openai("gpt-3.5-turbo"),
-      prompt,
+      prompt: messages[0].content,
+      system,
       maxTokens: 50,
       temperature: 0.6,
     });
