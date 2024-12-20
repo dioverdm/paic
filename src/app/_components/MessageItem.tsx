@@ -49,12 +49,12 @@ export const MessageItem = memo(function MessageItem({
         >
           <MarkdownContent content={message.content} />
         </div>
-        <div className="flex justify-end my-3">
+        <div className="flex justify-end">
           {message.experimental_attachments &&
             message.experimental_attachments.map((attachment) => (
               <div
                 key={attachment.url}
-                className="relative w-48 aspect-square bg-muted rounded-lg overflow-hidden"
+                className="relative w-48 aspect-square bg-muted rounded-lg overflow-hidden my-3"
               >
                 <Image
                   src={attachment.url}
