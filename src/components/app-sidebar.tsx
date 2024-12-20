@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Frame, LifeBuoy, Map, PieChart, Send } from "lucide-react";
-
+import { LifeBuoy, Send } from "lucide-react";
+import { useEffect, useState } from "react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { LogoComp } from "@/components/logo-comp";
@@ -14,79 +14,79 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavSecondary } from "./nav-secondary";
+import Link from "next/link";
+import { useChat } from "@/hooks/use-chat";
+import { useParams } from "next/navigation";
 
-// This is sample data.
-const data = {
-  user: {
-    name: "Harshit Sharma",
-    email: "cwd.harshit911@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: "/logo.svg",
-      plan: "Enterprise",
-    },
-  ],
-  navMain: [
-    {
-      title: "Today",
-      items: [
-        {
-          title: "How do I design a new page?",
-          url: "#",
-        },
-        {
-          title: "How to use the AI",
-          url: "#",
-        },
-        {
-          title: "How do I use the AI to generate content?",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Yesterday",
-      items: [
-        {
-          title: "How do I integrate with external APIs?",
-          url: "#",
-        },
-        {
-          title: "What are best practices for error handling?",
-          url: "#",
-        },
-        {
-          title: "Can you explain dependency injection?",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Previous 30 Days",
-      items: [
-        {
-          title: "How to implement authentication?",
-          url: "#",
-        },
-        {
-          title: "What's the difference between props and state?",
-          url: "#",
-        },
-        {
-          title: "How do I optimize React performance?",
-          url: "#",
-        },
-        {
-          title: "Best practices for state management?",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
+// Types for our chat data structure
+interface ChatGroup {
+  title: string;
+  items: Array<{
+    title: string;
+    url: string;
+    id: string;
+    isActive?: boolean;
+  }>;
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { getAllChats } = useChat();
+  const [navMain, setNavMain] = useState<ChatGroup[]>([]);
+  const { id } = useParams();
+  useEffect(() => {
+    const chats = getAllChats();
+    console.log(chats);
+    // Group chats by date
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const groupedChats: ChatGroup[] = [
+      {
+        title: "Today",
+        items: [],
+      },
+      {
+        title: "Yesterday",
+        items: [],
+      },
+      {
+        title: "Previous 30 Days",
+        items: [],
+      },
+    ];
+
+    chats.forEach((chat) => {
+      const chatDate = new Date(chat.createdAt);
+      const chatItem = {
+        title: chat.name,
+        url: `/c/${chat.id}`,
+        id: chat.id,
+        isActive: chat.id === id,
+      };
+
+      if (chatDate.toDateString() === today.toDateString()) {
+        groupedChats[0].items.push(chatItem);
+      } else if (chatDate.toDateString() === yesterday.toDateString()) {
+        groupedChats[1].items.push(chatItem);
+      } else if (chatDate >= new Date(today.setDate(today.getDate() - 30))) {
+        groupedChats[2].items.push(chatItem);
+      }
+    });
+
+    // Filter out empty groups and reverse items to show newest first
+    const filteredGroups = groupedChats
+      .filter((group) => group.items.length > 0)
+      .map((group) => ({
+        ...group,
+        items: group.items.reverse(),
+      }));
+
+    setNavMain(filteredGroups);
+  }, [getAllChats, id]);
+
+  // Static data for other navigation items
+  const navSecondary = [
     {
       title: "Support",
       url: "#",
@@ -97,38 +97,27 @@ const data = {
       url: "#",
       icon: Send,
     },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-};
+  ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = {
+    name: "Harshit Sharma",
+    email: "cwd.harshit911@gmail.com",
+    avatar: "/avatars/shadcn.jpg",
+  };
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
-        <LogoComp />
+        <Link href={"/"}>
+          <LogoComp />
+        </Link>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={navMain} />
+        <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

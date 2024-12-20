@@ -31,7 +31,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useChat } from "ai/react";
 import useMessages from "@/hooks/use-messages";
-
+import { useParams, useRouter } from "next/navigation";
+import { useChat as useChatStore } from "@/hooks/use-chat";
 const AI_MODELS = [
   {
     name: "OpenAI: GPT-4o",
@@ -110,11 +111,41 @@ const FileDisplay = ({
 export default function AIInput_10() {
   const menuRef = useRef<HTMLDivElement & HTMLElement>(null);
   const { setMessages } = useMessages();
-  const { messages, handleInputChange, handleSubmit, isLoading, stop } =
-    useChat({
-      api: "/api/chat",
-      credentials: "include",
-    });
+  const { createChat, updateChat, getChat } = useChatStore();
+  const [runInitialChat, setRunInitialChat] = useState(false);
+  const [init, setInit] = useState(false);
+  const router = useRouter();
+  const params = useParams();
+  const chatId = params.id;
+  const {
+    messages,
+    setMessages: setAiMessages,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    stop,
+  } = useChat({
+    api: "/api/chat",
+    credentials: "include",
+    onFinish() {
+      if (!chatId && messages.length < 3) {
+        setRunInitialChat(true);
+      } else {
+        updateChat(chatId as string, messages);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (runInitialChat && !isLoading) {
+      // setTimeout(() => {
+      const chatId = createChat(messages[0].content);
+      updateChat(chatId, messages);
+      router.push(`/c/${chatId}`);
+      setRunInitialChat(false);
+      // }, 1000);
+    }
+  }, [createChat, isLoading, messages, runInitialChat, updateChat, router]);
 
   const [state, setState] = useState({
     value: "",
@@ -156,14 +187,24 @@ export default function AIInput_10() {
   };
 
   useEffect(() => {
-    // Set up interval to update messages every 50ms
-    const intervalId = setInterval(() => {
-      setMessages(messages);
-    }, 50);
+    if (messages.length > 0 && init) {
+      const intervalId = setInterval(() => {
+        setMessages(messages);
+      }, 50);
 
-    // Clean up interval on unmount
-    return () => clearInterval(intervalId);
-  }, [messages, setMessages]);
+      // Clean up interval on unmount
+      return () => clearInterval(intervalId);
+    }
+  }, [messages, setMessages, init]);
+
+  useEffect(() => {
+    if (!init) {
+      const chat = getChat(chatId as string);
+      setAiMessages(chat?.messages || []);
+      setMessages(chat?.messages || []);
+      setInit(true);
+    }
+  }, [chatId, getChat, init, setAiMessages, setMessages]);
 
   return (
     <form

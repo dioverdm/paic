@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export function NavMain({
   items,
@@ -22,6 +23,7 @@ export function NavMain({
       title: string;
       url: string;
       isActive?: boolean;
+      id: string;
     }[];
   }[];
 }) {
@@ -35,11 +37,11 @@ export function NavMain({
           <SidebarGroupContent>
             <SidebarMenu>
               {item.items?.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton asChild isActive={item.isActive}>
-                    <a href={item.url} title={item.title}>
+                    <Link href={item.url} title={item.title}>
                       <p className="truncate">{item.title}</p>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
