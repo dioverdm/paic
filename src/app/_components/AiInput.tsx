@@ -128,7 +128,7 @@ export default function AIInput_10() {
     value: "",
     fileName: "",
     isPrivacyMode: false,
-    selectedModel: "OpenAI: GPT-4o",
+    selectedModel: "OpenAI: GPT-4o-mini",
     isMenuOpen: false,
     isModelMenuOpen: false,
   });
