@@ -74,9 +74,6 @@ Notes:
 - The AI should remain unbiased and provide balanced perspectives, especially in fields where opinions may vary.
 - Promptly identify and flag misinformation or outdated data where found.`;
 
-  // Log the system prompt for debugging purposes
-  console.log(systemPrompt);
-
   const result = streamText({
     model: selectedModel(model),
     messages,
