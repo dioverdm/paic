@@ -2,6 +2,8 @@ import { openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { createOpenAI as createOpenRouter } from "@ai-sdk/openai";
 import { streamText } from "ai";
+import { z } from "zod";
+import { axiosInstance } from "@/lib/utils";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -74,10 +76,32 @@ Notes:
 - The AI should remain unbiased and provide balanced perspectives, especially in fields where opinions may vary.
 - Promptly identify and flag misinformation or outdated data where found.`;
 
+  let searched = false;
+
   const result = streamText({
     model: selectedModel(model),
     messages,
     system: systemPrompt,
+    maxSteps: 10,
+    tools: {
+      searchWeb: {
+        description:
+          "Search the web for information and give the most relevant results",
+        parameters: z.object({
+          query: z.string(),
+        }),
+        execute: async ({ query }) => {
+          // const results = await searchWeb(query);
+          const response = !searched
+            ? await axiosInstance.post("/search", {
+                query,
+              })
+            : { data: "No more searches allowed" };
+          searched = true;
+          return response.data;
+        },
+      },
+    },
   });
 
   return result.toDataStreamResponse();
