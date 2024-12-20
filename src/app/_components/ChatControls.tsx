@@ -21,12 +21,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 interface MinimalChatControlsProps {
   selectedModel?: string;
   onModelSelect?: (modelName: string) => void;
+  tokenUsage?: number;
 }
 
 export default function MinimalChatControls({
   selectedModel = "OpenAI: GPT-4o-mini",
   onModelSelect = () => {},
-}: MinimalChatControlsProps) {
+}: //   tokenUsage = 3600,
+MinimalChatControlsProps) {
   // Get display name for selected model
   const displayName = selectedModel.split(":")[1]?.trim() || selectedModel;
 
@@ -94,6 +96,9 @@ export default function MinimalChatControls({
         >
           <ThumbsDown className="h-4 w-4" />
         </Button>
+        {/* <div className="text-xs text-muted-foreground pl-3">
+          {tokenUsage} tokens used
+        </div> */}
       </div>
     </div>
   );
