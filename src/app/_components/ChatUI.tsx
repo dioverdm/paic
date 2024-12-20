@@ -10,7 +10,9 @@ export default function ChatUI() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   }, []);
 
   useEffect(() => {
@@ -26,9 +28,7 @@ export default function ChatUI() {
       <div className="flex-1 overflow-y-auto">
         <div className="w-full mx-auto space-y-6">
           {messages?.map((message) => (
-            <div key={message.id}>
-              <MessageItem key={message.id} message={message} />
-            </div>
+            <MessageItem key={message.id} message={message} />
           ))}
           <div ref={messagesEndRef} />
         </div>

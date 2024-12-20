@@ -33,9 +33,9 @@ export const MessageItem = memo(function MessageItem({
         </div>
       )}
       <div
-        className={`rounded-lg px-4 py-2 max-w-[80%] ${
+        className={`rounded-lg px-4 py-2 ${
           message.role === "user"
-            ? "bg-primary text-primary-foreground"
+            ? "bg-primary text-primary-foreground max-w-[80%]"
             : "bg-sidebar max-w-[90%]"
         }`}
       >
