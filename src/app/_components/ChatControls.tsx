@@ -33,7 +33,7 @@ MinimalChatControlsProps) {
   const displayName = selectedModel.split(":")[1]?.trim() || selectedModel;
 
   return (
-    <div className="flex items-center gap-1 px-2 py-1">
+    <div className="flex items-center gap-1 px-2 py-1 ml-10">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

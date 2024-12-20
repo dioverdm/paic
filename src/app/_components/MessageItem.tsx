@@ -4,7 +4,6 @@ import { Message } from "ai";
 import { MarkdownContent } from "./MarkdownContent";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import MinimalChatControls from "./ChatControls";
 
 interface MessageItemProps {
   message: Message;
@@ -15,8 +14,8 @@ export const MessageItem = memo(function MessageItem({
 }: MessageItemProps) {
   return (
     <motion.div
-      className={`flex flex-col gap-1.5 ${
-        message.role === "user" ? "items-end" : "items-start"
+      className={`flex gap-2 ${
+        message.role === "user" ? "justify-end" : "justify-start"
       }`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -67,7 +66,6 @@ export const MessageItem = memo(function MessageItem({
             ))}
         </div>
       </div>
-      {message.role === "assistant" && <MinimalChatControls />}
     </motion.div>
   );
 });
