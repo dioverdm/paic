@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import React, { useCallback, useEffect, useRef } from "react";
 import { MessageItem } from "./MessageItem";
 import useMessages from "@/hooks/use-messages";
+import ChatControls from "./ChatControls";
 
 export default function ChatUI() {
   const { messages } = useMessages();
@@ -28,7 +29,10 @@ export default function ChatUI() {
       <div className="flex-1 overflow-y-auto">
         <div className="w-full mx-auto space-y-6">
           {messages?.map((message) => (
-            <MessageItem key={message.id} message={message} />
+            <div key={message.id}>
+              <MessageItem key={message.id} message={message} />
+              {message.role === "assistant" && <ChatControls />}
+            </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
