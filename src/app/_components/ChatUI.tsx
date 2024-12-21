@@ -7,7 +7,7 @@ import useMessages from "@/hooks/use-messages";
 import ChatControls from "./ChatControls";
 
 export default function ChatUI() {
-  const { messages } = useMessages();
+  const { messages, isLoading } = useMessages();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -28,12 +28,17 @@ export default function ChatUI() {
     >
       <div className="flex-1 overflow-y-auto">
         <div className="w-full mx-auto space-y-6">
-          {messages?.map((message) => (
+          {messages?.map((message, index) => (
             <div key={message.id}>
-              <MessageItem key={message.id} message={message} />
+              <MessageItem
+                key={message.id}
+                message={message}
+                isLoading={isLoading && index === messages.length - 1}
+              />
               {message.role === "assistant" && <ChatControls />}
             </div>
           ))}
+
           <div ref={messagesEndRef} />
         </div>
       </div>

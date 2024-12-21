@@ -4,13 +4,16 @@ import { Message } from "ai";
 import { MarkdownContent } from "./MarkdownContent";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 interface MessageItemProps {
   message: Message;
+  isLoading: boolean;
 }
 
 export const MessageItem = memo(function MessageItem({
   message,
+  isLoading,
 }: MessageItemProps) {
   return (
     <motion.div
@@ -30,6 +33,11 @@ export const MessageItem = memo(function MessageItem({
             fill
             sizes="100%"
           />
+        </div>
+      )}
+      {isLoading && message.role === "assistant" && message.content === "" && (
+        <div className="flex justify-center items-center">
+          <Loader2 className="w-4 h-4 animate-spin" />
         </div>
       )}
       <div

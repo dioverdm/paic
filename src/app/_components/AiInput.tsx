@@ -64,7 +64,7 @@ const FileDisplay = ({
 
 export default function AIInput_10() {
   const menuRef = useRef<HTMLDivElement & HTMLElement>(null);
-  const { setMessages } = useMessages();
+  const { setMessages, setIsLoading } = useMessages();
   const { createChat, updateChat, getChat } = useChatStore();
   const [runInitialChat, setRunInitialChat] = useState(false);
   const [updateChatLoading, setUpdateChatLoading] = useState(false);
@@ -209,12 +209,13 @@ export default function AIInput_10() {
     if (messages.length > 0 && init) {
       const intervalId = setInterval(() => {
         setMessages(messages);
+        setIsLoading(isLoading);
       }, 50);
 
       // Clean up interval on unmount
       return () => clearInterval(intervalId);
     }
-  }, [messages, setMessages, init]);
+  }, [messages, setMessages, init, setIsLoading, isLoading]);
 
   useEffect(() => {
     if (!init) {
@@ -233,11 +234,15 @@ export default function AIInput_10() {
   return (
     <form
       className="w-full py-4"
-      onSubmit={(e) =>
+      onSubmit={(e) => {
+        e.preventDefault();
         handleSubmit(e, {
           experimental_attachments: files,
-        })
-      }
+        });
+        updateState({ value: "" });
+        setFiles(undefined);
+        adjustHeight(true);
+      }}
     >
       <div className="rounded-xl bg-sidebar">
         <div ref={menuRef}>

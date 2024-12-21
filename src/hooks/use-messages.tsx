@@ -20,6 +20,8 @@ interface MessagesStore {
   setVisibleRange: (range: { start: number; end: number }) => void;
   createChat: (name: string, messages: Message[]) => string;
   getChat: (chatId: string) => Chat | undefined;
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 const useMessages = create<MessagesStore>((set, get) => ({
@@ -63,6 +65,8 @@ const useMessages = create<MessagesStore>((set, get) => ({
     const state = get();
     return state.chats.find((chat) => chat.id === chatId);
   },
+  isLoading: false,
+  setIsLoading: (isLoading) => set({ isLoading }),
 }));
 
 export default useMessages;
