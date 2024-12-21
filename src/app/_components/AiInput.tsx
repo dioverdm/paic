@@ -65,7 +65,12 @@ const FileDisplay = ({
 export default function AIInput_10() {
   const menuRef = useRef<HTMLDivElement & HTMLElement>(null);
   const { setMessages, setIsLoading } = useMessages();
-  const { createChat, updateChat, getChat } = useChatStore();
+  const {
+    createChat,
+    updateChat,
+    getChat,
+    // chatControls: { setSelectedModel },
+  } = useChatStore();
   const [runInitialChat, setRunInitialChat] = useState(false);
   const [updateChatLoading, setUpdateChatLoading] = useState(false);
   const [init, setInit] = useState(false);
@@ -196,6 +201,7 @@ export default function AIInput_10() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      // setSelectedModel();
       handleSubmit(e, {
         experimental_attachments: files,
       });
@@ -224,7 +230,8 @@ export default function AIInput_10() {
       setMessages(chat?.messages || []);
       updateState({
         selectedModel:
-          AI_MODELS.find((model) => model.name === chat?.model)?.name || "",
+          AI_MODELS.find((model) => model.name === chat?.model)?.name ||
+          "OpenAI: GPT-4o-mini",
       });
 
       setInit(true);
@@ -242,6 +249,10 @@ export default function AIInput_10() {
         updateState({ value: "" });
         setFiles(undefined);
         adjustHeight(true);
+        // setSelectedModel(
+        //   AI_MODELS.find((model) => model.name === state.selectedModel)?.name ||
+        //     ""
+        // );
       }}
     >
       <div className="rounded-xl bg-sidebar">
