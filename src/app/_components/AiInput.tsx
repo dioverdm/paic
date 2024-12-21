@@ -107,10 +107,17 @@ export default function AIInput_10() {
 
   useEffect(() => {
     if (updateChatLoading && !isLoading) {
-      updateChat(chatId as string, messages);
+      updateChat(chatId as string, messages, state.selectedModel);
       setUpdateChatLoading(false);
     }
-  }, [updateChatLoading, chatId, messages, updateChat, isLoading]);
+  }, [
+    updateChatLoading,
+    chatId,
+    messages,
+    updateChat,
+    isLoading,
+    state.selectedModel,
+  ]);
 
   useEffect(() => {
     if (runInitialChat && !isLoading) {
@@ -134,15 +141,23 @@ export default function AIInput_10() {
           }
 
           // Create chat with generated title
-          const chatId = createChat(title);
-          updateChat(chatId, messages);
+          const chatId = createChat(title, messages, state.selectedModel);
+          updateChat(chatId, messages, state.selectedModel);
           router.push(`/c/${chatId}`);
         } catch (error) {
           console.error("Failed to generate title:", error);
           // Fallback to creating chat without custom title
-          const chatId = createChat(messages[0].content);
-          updateChat(chatId, messages);
+          const chatId = createChat(
+            messages[0].content,
+            messages,
+            state.selectedModel
+          );
+          updateChat(chatId, messages, state.selectedModel);
           router.push(`/c/${chatId}`);
+          setState((prev) => ({
+            ...prev,
+            selectedModel: state.selectedModel,
+          }));
         } finally {
           setRunInitialChat(false);
         }
@@ -150,7 +165,15 @@ export default function AIInput_10() {
 
       getTitleAndCreateChat();
     }
-  }, [createChat, isLoading, messages, runInitialChat, updateChat, router]);
+  }, [
+    createChat,
+    isLoading,
+    messages,
+    runInitialChat,
+    updateChat,
+    router,
+    state.selectedModel,
+  ]);
 
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: MIN_HEIGHT,
@@ -198,9 +221,14 @@ export default function AIInput_10() {
       const chat = getChat(chatId as string);
       setAiMessages(chat?.messages || []);
       setMessages(chat?.messages || []);
+      updateState({
+        selectedModel:
+          AI_MODELS.find((model) => model.name === chat?.model)?.name || "",
+      });
+
       setInit(true);
     }
-  }, [chatId, getChat, init, setAiMessages, setMessages]);
+  }, [chatId, getChat, init, setAiMessages, setMessages, updateState]);
 
   return (
     <form
@@ -218,9 +246,14 @@ export default function AIInput_10() {
               <div className="relative" data-model-menu>
                 <Select
                   value={state.selectedModel}
-                  onValueChange={(value) =>
-                    updateState({ selectedModel: value })
-                  }
+                  onValueChange={(value) => {
+                    if (value !== "") {
+                      const selectedModel =
+                        AI_MODELS.find((model) => model.value === value)
+                          ?.name || value;
+                      updateState({ selectedModel: selectedModel });
+                    }
+                  }}
                 >
                   <SelectTrigger className="flex items-center gap-1.5 rounded-lg px-2 py-1">
                     <Brain className="w-4 h-4 dark:text-white" />

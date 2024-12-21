@@ -9,6 +9,7 @@ interface Chat {
   id: string;
   name: string;
   messages: Message[];
+  model: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,8 +19,8 @@ interface Chat {
  */
 interface ChatStore {
   chats: Chat[];
-  createChat: (name: string, messages?: Message[]) => string;
-  updateChat: (chatId: string, messages: Message[]) => void;
+  createChat: (name: string, messages?: Message[], model?: string) => string;
+  updateChat: (chatId: string, messages: Message[], model?: string) => void;
   deleteChat: (chatId: string) => void;
   getChat: (chatId: string) => Chat | undefined;
   getAllChats: () => Chat[];
@@ -30,12 +31,13 @@ export const useChat = create<ChatStore>()(
     (set, get) => ({
       chats: [],
 
-      createChat: (name, messages = []) => {
+      createChat: (name, messages = [], model = "OpenAI: GPT-4o-mini") => {
         const chatId = crypto.randomUUID();
         const newChat: Chat = {
           id: chatId,
           name,
           messages,
+          model,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -47,11 +49,16 @@ export const useChat = create<ChatStore>()(
         return chatId;
       },
 
-      updateChat: (chatId, messages) => {
+      updateChat: (chatId, messages, model) => {
         set((state) => ({
           chats: state.chats.map((chat) =>
             chat.id === chatId
-              ? { ...chat, messages, updatedAt: new Date() }
+              ? {
+                  ...chat,
+                  messages,
+                  model: model || chat.model,
+                  updatedAt: new Date(),
+                }
               : chat
           ),
         }));
