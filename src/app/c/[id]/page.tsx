@@ -28,10 +28,6 @@ export default function Page() {
     reload,
   } = useChat({
     api: "/api/chat",
-    body: {
-      provider: "openai",
-      model: "gpt-4o-mini",
-    },
     onFinish() {
       setChatUpdate(true);
     },
