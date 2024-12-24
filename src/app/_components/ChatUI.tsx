@@ -35,7 +35,8 @@ export default function ChatUI() {
                 message={message}
                 isLoading={isLoading && index === messages.length - 1}
               />
-              {message.role === "assistant" && <ChatControls />}
+              {message.role === "assistant" && index === messages.length - 1 && <ChatControls />}
+              
             </div>
           ))}
 
