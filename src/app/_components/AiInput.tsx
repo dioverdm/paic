@@ -122,6 +122,7 @@ export default function AIInput_10({
           },
         }
       );
+      setInput("");
       updateState({ value: "" });
       setFiles(undefined);
       adjustHeight(true);
@@ -143,6 +144,7 @@ export default function AIInput_10({
             },
           }
         );
+        setInput("");
         updateState({ value: "" });
         setFiles(undefined);
         adjustHeight(true);

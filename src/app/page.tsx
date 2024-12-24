@@ -12,16 +12,12 @@ import AI_MODELS from "./_components/AIMODELS";
 export default function Page() {
   const { createChat } = useUserChat();
   const [initialChatCreation, setInitialChatCreation] = React.useState(false);
-  const [model, setModel] = React.useState("gpt-4o-mini");
+  const [model, setModel] = React.useState("OpenAI: GPT-4o-mini");
   const router = useRouter();
 
   const { messages, input, setInput, append, isLoading, stop, reload } =
     useChat({
       api: "/api/chat",
-      body: {
-        provider: "openai",
-        model: "gpt-4o-mini",
-      },
       onFinish() {
         setInitialChatCreation(true);
       },
