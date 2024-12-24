@@ -129,6 +129,37 @@ export default function AIInput_10({
     }
   };
 
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLTextAreaElement>, prev?: FileList) => {
+      const items = e.clipboardData?.items;
+      if (items) {
+        let preventDefault = false;
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.kind === "file") {
+            const file = item.getAsFile();
+            if (file) {
+              preventDefault = true;
+              const dataTransfer = new DataTransfer();
+              if (prev) {
+                Array.from(prev).forEach((f) => dataTransfer.items.add(f));
+              }
+              dataTransfer.items.add(file);
+              if (fileInputRef.current) {
+                fileInputRef.current.files = dataTransfer.files;
+                setFiles(dataTransfer.files);
+              }
+            }
+          }
+        }
+        if (preventDefault) {
+          e.preventDefault();
+        }
+      }
+    },
+    []
+  );
+
   return (
     <form
       className="w-full py-4"
@@ -281,6 +312,7 @@ export default function AIInput_10({
               ref={textareaRef}
               value={input}
               placeholder="Type your message..."
+              onPaste={handlePaste}
               className={cn(
                 "w-full rounded-xl pl-14 pr-10 border-none resize-none bg-transparent dark:text-white placeholder:text-black/70 dark:placeholder:text-white/70 focus-visible:ring-transparent focus-visible:outline-none",
                 `min-h-[${MIN_HEIGHT}px]`
