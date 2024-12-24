@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/sidebar";
 import { NavSecondary } from "./nav-secondary";
 import Link from "next/link";
-import { useChat } from "@/hooks/use-chat";
 import { useParams } from "next/navigation";
+import { useUserChat } from "@/store/userChat";
 
 // Types for our chat data structure
 interface ChatGroup {
@@ -30,12 +30,11 @@ interface ChatGroup {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { getAllChats } = useChat();
   const [navMain, setNavMain] = useState<ChatGroup[]>([]);
   const { id } = useParams();
+  const { getAllChats } = useUserChat();
   useEffect(() => {
     const chats = getAllChats();
-    console.log(chats);
     // Group chats by date
     const today = new Date();
     const yesterday = new Date(today);
@@ -59,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     chats.forEach((chat) => {
       const chatDate = new Date(chat.createdAt);
       const chatItem = {
-        title: chat.name,
+        title: chat.title,
         url: `/c/${chat.id}`,
         id: chat.id,
         isActive: chat.id === id,

@@ -11,7 +11,7 @@ import {
   Unlock,
   StopCircleIcon,
 } from "lucide-react";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
@@ -29,11 +29,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useChat } from "ai/react";
-import useMessages from "@/hooks/use-messages";
-import { useParams, useRouter } from "next/navigation";
-import { useChat as useChatStore } from "@/hooks/use-chat";
 import AI_MODELS from "./AIMODELS";
+import { ChatRequestOptions, CreateMessage, Message } from "ai";
 
 const MIN_HEIGHT = 40;
 
@@ -62,18 +59,28 @@ const FileDisplay = ({
   </div>
 );
 
-export default function AIInput_10() {
+export default function AIInput_10({
+  isLoading,
+  stop,
+  append,
+  input,
+  setInput,
+  model,
+  setModel,
+}: {
+  isLoading: boolean;
+  stop: () => void;
+  append: (
+    message: Message | CreateMessage,
+    chatRequestOptions?: ChatRequestOptions
+  ) => Promise<string | null | undefined>;
+  input: string;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  model: string;
+  setModel: React.Dispatch<React.SetStateAction<string>>;
+}) {
   const menuRef = useRef<HTMLDivElement & HTMLElement>(null);
-  const { setMessages, setIsLoading } = useMessages();
-  const {
-    createChat,
-    updateChat,
-    getChat,
-    // chatControls: { setSelectedModel },
-  } = useChatStore();
-  const [runInitialChat, setRunInitialChat] = useState(false);
-  const [updateChatLoading, setUpdateChatLoading] = useState(false);
-  const [init, setInit] = useState(false);
+
   const [state, setState] = useState({
     value: "",
     fileName: "",
@@ -82,103 +89,6 @@ export default function AIInput_10() {
     isMenuOpen: false,
     isModelMenuOpen: false,
   });
-  const router = useRouter();
-  const params = useParams();
-  const chatId = params.id;
-  const {
-    messages,
-    setMessages: setAiMessages,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    stop,
-  } = useChat({
-    api: "/api/chat",
-    credentials: "include",
-    onFinish() {
-      if (!chatId && messages.length < 3) {
-        setRunInitialChat(true);
-      } else {
-        setUpdateChatLoading(true);
-      }
-    },
-    body: {
-      provider: AI_MODELS.find((model) => model.name === state.selectedModel)
-        ?.provider,
-      model: AI_MODELS.find((model) => model.name === state.selectedModel)
-        ?.value,
-    },
-  });
-
-  useEffect(() => {
-    if (updateChatLoading && !isLoading) {
-      updateChat(chatId as string, messages, state.selectedModel);
-      setUpdateChatLoading(false);
-    }
-  }, [
-    updateChatLoading,
-    chatId,
-    messages,
-    updateChat,
-    isLoading,
-    state.selectedModel,
-  ]);
-
-  useEffect(() => {
-    if (runInitialChat && !isLoading) {
-      const getTitleAndCreateChat = async () => {
-        try {
-          // Get title suggestion from API using messages
-          const response = await fetch("/api/completion", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              messages: messages.slice(0, 2), // Send first two messages for context
-            }),
-          });
-
-          const { title = "New Chat", error } = await response.json();
-
-          if (error) {
-            throw new Error(error);
-          }
-
-          // Create chat with generated title
-          const chatId = createChat(title, messages, state.selectedModel);
-          updateChat(chatId, messages, state.selectedModel);
-          router.push(`/c/${chatId}`);
-        } catch (error) {
-          console.error("Failed to generate title:", error);
-          // Fallback to creating chat without custom title
-          const chatId = createChat(
-            messages[0].content,
-            messages,
-            state.selectedModel
-          );
-          updateChat(chatId, messages, state.selectedModel);
-          router.push(`/c/${chatId}`);
-          setState((prev) => ({
-            ...prev,
-            selectedModel: state.selectedModel,
-          }));
-        } finally {
-          setRunInitialChat(false);
-        }
-      };
-
-      getTitleAndCreateChat();
-    }
-  }, [
-    createChat,
-    isLoading,
-    messages,
-    runInitialChat,
-    updateChat,
-    router,
-    state.selectedModel,
-  ]);
 
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: MIN_HEIGHT,
@@ -202,57 +112,40 @@ export default function AIInput_10() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       // setSelectedModel();
-      handleSubmit(e, {
-        experimental_attachments: files,
-      });
+      append(
+        { content: input, role: "user" },
+        {
+          experimental_attachments: files,
+          body: {
+            model: AI_MODELS.find((m) => m.name === model)?.value || "",
+            provider: AI_MODELS.find((m) => m.name === model)?.provider || "",
+          },
+        }
+      );
       updateState({ value: "" });
       setFiles(undefined);
       adjustHeight(true);
     }
   };
 
-  useEffect(() => {
-    if (messages.length > 0 && init) {
-      const intervalId = setInterval(() => {
-        setMessages(messages);
-        setIsLoading(isLoading);
-      }, 50);
-
-      // Clean up interval on unmount
-      return () => clearInterval(intervalId);
-    }
-  }, [messages, setMessages, init, setIsLoading, isLoading]);
-
-  useEffect(() => {
-    if (!init) {
-      const chat = getChat(chatId as string);
-      setAiMessages(chat?.messages || []);
-      setMessages(chat?.messages || []);
-      updateState({
-        selectedModel:
-          AI_MODELS.find((model) => model.name === chat?.model)?.name ||
-          "OpenAI: GPT-4o-mini",
-      });
-
-      setInit(true);
-    }
-  }, [chatId, getChat, init, setAiMessages, setMessages, updateState]);
-
   return (
     <form
       className="w-full py-4"
       onSubmit={(e) => {
         e.preventDefault();
-        handleSubmit(e, {
-          experimental_attachments: files,
-        });
+        append(
+          { content: input, role: "user" },
+          {
+            experimental_attachments: files,
+            body: {
+              model: AI_MODELS.find((m) => m.name === model)?.value || "",
+              provider: AI_MODELS.find((m) => m.name === model)?.provider || "",
+            },
+          }
+        );
         updateState({ value: "" });
         setFiles(undefined);
         adjustHeight(true);
-        // setSelectedModel(
-        //   AI_MODELS.find((model) => model.name === state.selectedModel)?.name ||
-        //     ""
-        // );
       }}
     >
       <div className="rounded-xl bg-sidebar">
@@ -261,21 +154,14 @@ export default function AIInput_10() {
             <div className="flex justify-between items-center px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400">
               <div className="relative" data-model-menu>
                 <Select
-                  value={state.selectedModel}
+                  value={model}
                   onValueChange={(value) => {
-                    if (value !== "") {
-                      const selectedModel =
-                        AI_MODELS.find((model) => model.value === value)
-                          ?.name || value;
-                      updateState({ selectedModel: selectedModel });
-                    }
+                    setModel(value);
                   }}
                 >
                   <SelectTrigger className="flex items-center gap-1.5 rounded-lg px-2 py-1">
                     <Brain className="w-4 h-4 dark:text-white" />
-                    <span className="dark:text-white">
-                      {state.selectedModel}
-                    </span>
+                    <span className="dark:text-white">{model}</span>
                   </SelectTrigger>
                   <SelectContent className="w-64">
                     <SelectGroup>
@@ -391,7 +277,7 @@ export default function AIInput_10() {
             <Textarea
               id="ai-input-10"
               ref={textareaRef}
-              value={state.value}
+              value={input}
               placeholder="Type your message..."
               className={cn(
                 "w-full rounded-xl pl-14 pr-10 border-none resize-none bg-transparent dark:text-white placeholder:text-black/70 dark:placeholder:text-white/70 focus-visible:ring-transparent focus-visible:outline-none",
@@ -400,7 +286,7 @@ export default function AIInput_10() {
               onKeyDown={handleKeyDown}
               onChange={(e) => {
                 updateState({ value: e.target.value });
-                handleInputChange(e);
+                setInput(e.target.value);
                 adjustHeight();
               }}
             />

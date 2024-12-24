@@ -4,37 +4,44 @@ import { Button } from "@/components/ui/button";
 import { Copy, RotateCcw, ThumbsDown, ThumbsUp } from "lucide-react";
 import AI_MODELS from "./AIMODELS";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useChat } from "@/hooks/use-chat";
 import {
   Select,
   SelectItem,
   SelectContent,
   SelectTrigger,
 } from "@/components/ui/select";
+import { Attachment, ChatRequestOptions } from "ai";
+import React, { useEffect } from "react";
 
-export default function MinimalChatControls() {
-  // Get display name for selected model
-  const {
-    chatControls: {
-      setCopyToClipboard,
-      setSelectedModel,
-      setRegenerate,
-      setRegenerateWithModel,
-      selectedModel,
-    },
-  } = useChat();
-  const displayName = selectedModel.split(":")[1]?.trim() || selectedModel;
+export default function MinimalChatControls({
+  selectedModel,
+  reload,
+  experimental_attachments,
+  content,
+}: {
+  selectedModel: string;
+  reload: (
+    chatRequestOptions?: ChatRequestOptions
+  ) => Promise<string | null | undefined>;
+  experimental_attachments: Attachment[] | undefined;
+  content: string;
+}) {
+  const [model, setModel] = React.useState(selectedModel);
+  const displayName = model.split(":")[1]?.trim() || selectedModel;
+
+  useEffect(() => {
+    setModel(selectedModel);
+  }, [selectedModel]);
 
   return (
-    <div className="flex items-center gap-1 px-2 py-1 ml-10">
+    <div className="flex items-center gap-2 px-2 py-1 ml-10">
       <Select
-        value={selectedModel}
+        value={model}
         onValueChange={(value) => {
-          setSelectedModel(value);
-          setRegenerateWithModel(true);
+          setModel(value);
         }}
       >
-        <SelectTrigger className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground max-w-24">
+        <SelectTrigger className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground max-w-40">
           {displayName}
         </SelectTrigger>
         <SelectContent className="min-w-[140px]">
@@ -60,19 +67,30 @@ export default function MinimalChatControls() {
           variant="ghost"
           size="icon"
           className="h-7 w-7 text-muted-foreground hover:text-foreground"
-          onClick={() => setCopyToClipboard(true)}
-          title="Copy"
+          onClick={() => {
+            reload({
+              body: {
+                model: AI_MODELS.find((m) => m.name === model)?.value || "",
+                provider:
+                  AI_MODELS.find((m) => m.name === model)?.provider || "",
+              },
+              experimental_attachments,
+            });
+          }}
+          title="Regenerate"
         >
-          <Copy className="h-4 w-4" />
+          <RotateCcw className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           className="h-7 w-7 text-muted-foreground hover:text-foreground"
-          onClick={() => setRegenerate(true)}
-          title="Regenerate"
+          onClick={() => {
+            navigator.clipboard.writeText(content);
+          }}
+          title="Copy"
         >
-          <RotateCcw className="h-4 w-4" />
+          <Copy className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"

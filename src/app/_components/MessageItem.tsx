@@ -44,7 +44,7 @@ export const MessageItem = memo(function MessageItem({
         className={`rounded-lg px-4 py-2 ${
           message.role === "user"
             ? "bg-primary text-primary-foreground max-w-[80%]"
-            : "bg-sidebar max-w-[90%]"
+            : "bg-sidebar w-fit max-w-[80%]"
         }`}
       >
         <div
@@ -52,10 +52,10 @@ export const MessageItem = memo(function MessageItem({
             "prose dark:prose-invert prose-pre:p-4",
             message.role === "user"
               ? "text-primary-foreground whitespace-pre-wrap"
-              : ""
+              : "w-full"
           )}
         >
-          <MarkdownContent content={message.content} />
+          <MarkdownContent content={message.content} id={message.id} />
         </div>
         <div className="flex justify-end">
           {message.experimental_attachments &&
