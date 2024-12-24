@@ -13,7 +13,7 @@ export default function Page() {
   const { addMessage, getChat } = useUserChat();
   const [chatUpdate, setChatUpdate] = React.useState(false);
   const [initializeChat, setInitializeChat] = React.useState(false);
-  const [model, setModel] = React.useState("gpt-4o-mini");
+  const [model, setModel] = React.useState("OpenAI: GPT-4o-mini");
   const params = useParams();
   const { id } = params;
 
