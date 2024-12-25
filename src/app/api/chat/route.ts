@@ -49,17 +49,19 @@ export async function POST(req: Request) {
   // Decrypt API key
   const SECRET_KEY = process.env.ENCRYPTION_SECRET_KEY;
   if (!SECRET_KEY) {
-    throw new Error("Encryption secret key not configured");
+    return new Response("Encryption secret key not configured", {
+      status: 500,
+    });
   }
 
   const apiKey = decrypt(encryptedKey, SECRET_KEY);
 
   if (!messages || !model || !provider) {
-    return new Error("Missing required fields");
+    return new Response("Missing required fields", { status: 400 });
   }
 
   if (!apiKey) {
-    throw new Error("API key not found");
+    return new Response("API key not found", { status: 401 });
   }
 
   // Initialize provider with decrypted API key
