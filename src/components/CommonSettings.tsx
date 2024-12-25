@@ -127,7 +127,7 @@ export default function CommonSettings() {
         <div className="space-y-2">
           <Label>Temperature</Label>
           <div className="text-sm text-muted-foreground">
-            Maximum number of tokens to generate
+            Controls randomness in responses (0 is focused, 1 is creative)
           </div>
           <div className="flex items-center gap-4">
             <Slider
@@ -159,7 +159,8 @@ export default function CommonSettings() {
         <div className="space-y-2">
           <Label>TopP</Label>
           <div className="text-sm text-muted-foreground">
-            Maximum number of tokens to generate
+            Controls diversity of responses (lower values make output more
+            focused)
           </div>
           <div className="flex items-center gap-4">
             <Slider
