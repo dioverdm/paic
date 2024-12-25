@@ -10,10 +10,10 @@ import { RotateCcw, SaveIcon } from "lucide-react";
 
 export default function CommonSettings() {
   const [systemPrompt, setSystemPrompt] = useState("");
-  const [contextLength, setContextLength] = useState("4");
-  const [maxTokens, setMaxTokens] = useState("1000");
-  const [temperature, setTemperature] = useState(0.4);
-  const [topP, setTopP] = useState(0.8);
+  const [contextLength, setContextLength] = useState("20");
+  const [maxTokens, setMaxTokens] = useState("4000");
+  const [temperature, setTemperature] = useState(0.7);
+  const [topP, setTopP] = useState(0.9);
 
   useEffect(() => {
     // Load settings from localStorage
