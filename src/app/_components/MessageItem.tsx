@@ -44,12 +44,12 @@ export const MessageItem = memo(function MessageItem({
         className={`rounded-lg px-4 py-2 ${
           message.role === "user"
             ? "bg-primary text-primary-foreground max-w-[80%]"
-            : "bg-sidebar w-fit max-w-[80%]"
+            : "bg-sidebar w-full"
         }`}
       >
         <div
           className={cn(
-            "prose dark:prose-invert prose-pre:p-4",
+            "prose dark:prose-invert prose-pre:p-4 max-w-[100ch]",
             message.role === "user"
               ? "text-primary-foreground whitespace-pre-wrap"
               : "w-full"

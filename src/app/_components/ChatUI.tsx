@@ -54,7 +54,7 @@ export default function ChatUI({
               {message.role === "assistant" &&
                 !isLoading &&
                 index === messages.length - 1 &&
-                messages.length > 2 && (
+                messages.length >= 2 && (
                   <ChatControls
                     selectedModel={
                       chat?.messages.find((i) => i.id === message.id)?.model ||

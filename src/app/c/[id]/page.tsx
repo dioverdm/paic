@@ -48,9 +48,16 @@ export default function Page() {
             : new Date(),
         })) || [];
       setMessages(messages);
+      const modelFind = AI_MODELS.find(
+        (m) =>
+          m.name === chat?.messages[chat?.messages.length - 1]?.model || model
+      );
+
+      console.log("modelFind", modelFind);
+      // setModel(modelFind?.name || model);
       setInitializeChat(true);
     }
-  }, [getChat, id, initializeChat, setMessages]);
+  }, [getChat, id, initializeChat, setMessages, model]);
 
   useEffect(() => {
     if (chatUpdate && !isLoading) {
