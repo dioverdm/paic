@@ -1,33 +1,91 @@
-import { openai } from "@ai-sdk/openai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAI as createOpenRouter } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
+import { cookies } from "next/headers";
+import crypto from "crypto";
+
+// Helper function to derive a 32-byte key
+const deriveKey = (secret: string): Buffer => {
+  return crypto.createHash("sha256").update(String(secret)).digest();
+};
+
+// Decryption function
+const decrypt = (encryptedData: string, secret: string) => {
+  const [ivHex, encryptedHex] = encryptedData.split(":");
+  const iv = Buffer.from(ivHex, "hex");
+  const key = deriveKey(secret);
+  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+  let decrypted = decipher.update(encryptedHex, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+  return decrypted;
+};
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
-const openrouter = createOpenRouter({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-});
 
 export async function POST(req: Request) {
-  const { messages, model, provider } = await req.json();
+  const cookieStore = await cookies();
+  const body = await req.json();
+  const {
+    messages,
+    model,
+    provider,
+    systemPrompt,
+    contextLength,
+    maxTokens,
+    temperature,
+    topP,
+  } = body;
 
-  console.log(provider, model);
+  // Get encrypted API key from cookies
+  const encryptedKey = cookieStore.get(
+    `${provider.toLowerCase()}-api-key`
+  )?.value;
+  if (!encryptedKey) {
+    return new Response("API key not found", { status: 401 });
+  }
+
+  // Decrypt API key
+  const SECRET_KEY = process.env.ENCRYPTION_SECRET_KEY;
+  if (!SECRET_KEY) {
+    throw new Error("Encryption secret key not configured");
+  }
+
+  const apiKey = decrypt(encryptedKey, SECRET_KEY);
+
+  if (!messages || !model || !provider) {
+    return new Error("Missing required fields");
+  }
+
+  if (!apiKey) {
+    throw new Error("API key not found");
+  }
+
+  // Initialize provider with decrypted API key
   const selectedModel = (() => {
     switch (provider) {
       case "openai":
-        return openai;
+        return createOpenAI({
+          apiKey,
+        });
       case "anthropic":
-        return anthropic;
+        return createAnthropic({
+          apiKey,
+        });
       case "openrouter":
-        return openrouter;
+        return createOpenRouter({
+          baseURL: "https://openrouter.ai/api/v1",
+          apiKey,
+        });
       default:
         throw new Error("Invalid AI provider specified");
     }
   })();
-  // Define the system prompt that sets the AI assistant's personality and capabilities
-  const systemPrompt: string = `You are Lume, an AI expert in every field, created by Harshit Sharma, a 19-year-old full stack developer based in India. Your capabilities include providing accurate and reliable information across diverse subjects, including programming and technology. Your task is to interpret user queries, assess the context, and deliver clear, concise, and context-specific responses.
+  // Use the system prompt from settings if provided, otherwise use default
+  const finalSystemPrompt =
+    systemPrompt ||
+    `You are Lume, an AI expert in every field, created by Harshit Sharma, a 19-year-old full stack developer based in India. Your capabilities include providing accurate and reliable information across diverse subjects, including programming and technology. Your task is to interpret user queries, assess the context, and deliver clear, concise, and context-specific responses.
 
 Details:
 - Function as a knowledgeable assistant, delivering expertise tailored to the user's request.
@@ -75,9 +133,12 @@ Notes:
 - Promptly identify and flag misinformation or outdated data where found.`;
 
   const result = streamText({
-    model: selectedModel(model),
-    messages,
-    system: systemPrompt,
+    model: selectedModel(model, {}),
+    messages: messages.slice(-contextLength), // Use contextLength from settings
+    system: finalSystemPrompt,
+    maxTokens, // Use maxTokens from settings
+    temperature, // Use temperature from settings
+    topP, // Use topP from settings
     maxSteps: 10,
   });
 

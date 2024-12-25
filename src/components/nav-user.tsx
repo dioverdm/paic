@@ -25,6 +25,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { SettingsDialog } from "./settings";
+import React from "react";
 
 export function NavUser({
   user,
@@ -36,6 +38,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
 
   return (
     <SidebarMenu>
@@ -82,7 +85,7 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
                 <Sparkles />
                 Settings
               </DropdownMenuItem>
@@ -109,6 +112,7 @@ export function NavUser({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <SettingsDialog open={settingsOpen} setOpen={setSettingsOpen} />
       </SidebarMenuItem>
     </SidebarMenu>
   );

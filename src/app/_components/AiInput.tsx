@@ -108,10 +108,38 @@ export default function AIInput_10({
     if (state.isModelMenuOpen) updateState({ isModelMenuOpen: false });
   });
 
+  const getSettings = () => ({
+    systemPrompt: localStorage.getItem("systemPrompt") || "",
+    contextLength: parseInt(localStorage.getItem("contextLength") || "4"),
+    maxTokens: parseInt(localStorage.getItem("maxTokens") || "1000"),
+    temperature: parseFloat(localStorage.getItem("temperature") || "0.4"),
+    topP: parseFloat(localStorage.getItem("topP") || "0.8"),
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const settings = getSettings();
+    append(
+      { content: input, role: "user" },
+      {
+        experimental_attachments: files,
+        body: {
+          model: AI_MODELS.find((m) => m.name === model)?.value || "",
+          provider: AI_MODELS.find((m) => m.name === model)?.provider || "",
+          ...settings, // Include all settings in the request
+        },
+      }
+    );
+    setInput("");
+    updateState({ value: "" });
+    setFiles(undefined);
+    adjustHeight(true);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      // setSelectedModel();
+      const settings = getSettings();
       append(
         { content: input, role: "user" },
         {
@@ -119,6 +147,7 @@ export default function AIInput_10({
           body: {
             model: AI_MODELS.find((m) => m.name === model)?.value || "",
             provider: AI_MODELS.find((m) => m.name === model)?.provider || "",
+            ...settings, // Include all settings in the request
           },
         }
       );
@@ -161,26 +190,7 @@ export default function AIInput_10({
   );
 
   return (
-    <form
-      className="w-full py-4"
-      onSubmit={(e) => {
-        e.preventDefault();
-        append(
-          { content: input, role: "user" },
-          {
-            experimental_attachments: files,
-            body: {
-              model: AI_MODELS.find((m) => m.name === model)?.value || "",
-              provider: AI_MODELS.find((m) => m.name === model)?.provider || "",
-            },
-          }
-        );
-        setInput("");
-        updateState({ value: "" });
-        setFiles(undefined);
-        adjustHeight(true);
-      }}
-    >
+    <form className="w-full py-4" onSubmit={handleSubmit}>
       <div className="rounded-xl bg-sidebar">
         <div ref={menuRef}>
           <div className="border-b border-black/10 dark:border-white/10">
