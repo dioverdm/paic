@@ -62,8 +62,26 @@ export default function ChatUI({
 
                 {message.role === "assistant" &&
                   !isLoading &&
-                  index === messages.length - 1 &&
-                  messages.length >= 2 &&
+                  index ===
+                    messages
+                      .filter((message) => message.role !== "system")
+                      .filter(
+                        (message) =>
+                          !message.toolInvocations?.find(
+                            (toolInvocation) =>
+                              toolInvocation.toolName === "rememberInformation"
+                          )
+                      ).length -
+                      1 &&
+                  messages
+                    .filter((message) => message.role !== "system")
+                    .filter(
+                      (message) =>
+                        !message.toolInvocations?.find(
+                          (toolInvocation) =>
+                            toolInvocation.toolName === "rememberInformation"
+                        )
+                    ).length >= 2 &&
                   id && (
                     <ChatControls
                       selectedModel={
