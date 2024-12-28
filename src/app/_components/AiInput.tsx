@@ -11,7 +11,7 @@ import {
   Unlock,
   StopCircleIcon,
 } from "lucide-react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
@@ -29,6 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePathname } from "next/navigation";
 import AI_MODELS from "./AIMODELS";
 import { ChatRequestOptions, CreateMessage, Message } from "ai";
 
@@ -80,6 +81,7 @@ export default function AIInput_10({
   setModel: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const menuRef = useRef<HTMLDivElement & HTMLElement>(null);
+  const pathname = usePathname();
 
   const [state, setState] = useState({
     value: "",
@@ -188,6 +190,20 @@ export default function AIInput_10({
     },
     []
   );
+
+  // Add focus effect when pathname changes
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [pathname, textareaRef]);
+
+  // Add initial focus
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [textareaRef]);
 
   return (
     <form className="w-full py-4" onSubmit={handleSubmit}>
