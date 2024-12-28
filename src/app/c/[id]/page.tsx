@@ -9,6 +9,8 @@ import ChatUI from "@/app/_components/ChatUI";
 import AIInput_10 from "@/app/_components/AiInput";
 import AI_MODELS from "@/app/_components/AIMODELS";
 
+type ArgsForMemory = { memory: string[] };
+
 export default function Page() {
   const { addMessage, getChat } = useUserChat();
   const [chatUpdate, setChatUpdate] = React.useState(false);
@@ -33,6 +35,27 @@ export default function Page() {
     },
     experimental_throttle: 100,
     id: id as string,
+    onToolCall({ toolCall }) {
+      console.log("Tool call", toolCall);
+      if (toolCall?.toolName === "rememberInformation") {
+        const previousMemory = localStorage.getItem("previousMemory");
+        let memory: string[] = [];
+        if (previousMemory) {
+          // parse Array of strings
+          memory = JSON.parse(previousMemory) as string[];
+        }
+        const array = (toolCall.args as ArgsForMemory).memory;
+        localStorage.setItem(
+          "previousMemory",
+          JSON.stringify([...memory, ...array])
+        );
+
+        console.log(
+          "Tool call",
+          JSON.stringify((toolCall.args as ArgsForMemory).memory)
+        );
+      }
+    },
   });
 
   useEffect(() => {
@@ -83,6 +106,8 @@ export default function Page() {
       setChatUpdate(false);
     }
   }, [messages, chatUpdate, isLoading, addMessage, id, model]);
+
+  console.log("messages", messages);
 
   return (
     <div className="flex-1 flex justify-center">

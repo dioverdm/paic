@@ -4,6 +4,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { cookies } from "next/headers";
 import crypto from "crypto";
+import { z } from "zod";
 
 // Helper function to derive a 32-byte key
 const deriveKey = (secret: string): Buffer => {
@@ -142,6 +143,25 @@ Notes:
     temperature, // Use temperature from settings
     topP, // Use topP from settings
     maxSteps: 10,
+    tools: {
+      rememberInformation: {
+        description: `When you encounter important information that should be remembered, return an array of concise memory strings. Important information includes:
+- User preferences and settings
+- Personal details shared by the user
+- Key decisions or choices made
+- Important facts or context needed for future conversations
+Compare with previous memories to avoid duplicates. Format each memory as a clear, concise string.`,
+        parameters: z.object({
+          memory: z
+            .array(z.string())
+            .optional()
+            .describe("The info to remember!"),
+        }),
+        execute: async ({ memory }: { memory: string[] }) => {
+          return memory || [];
+        },
+      },
+    },
   });
 
   return result.toDataStreamResponse();
