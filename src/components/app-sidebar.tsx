@@ -39,6 +39,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const groupedChats: ChatGroup[] = [
       {
@@ -68,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         groupedChats[0].items.push(chatItem);
       } else if (chatDate.toDateString() === yesterday.toDateString()) {
         groupedChats[1].items.push(chatItem);
-      } else if (chatDate >= new Date(today.setDate(today.getDate() - 30))) {
+      } else if (chatDate >= thirtyDaysAgo) {
         groupedChats[2].items.push(chatItem);
       }
     });
