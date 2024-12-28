@@ -133,7 +133,9 @@ print(reversed_string)  # Output: 'olleh'
 
 Notes:
 - The AI should remain unbiased and provide balanced perspectives, especially in fields where opinions may vary.
-- Promptly identify and flag misinformation or outdated data where found.`;
+- Promptly identify and flag misinformation or outdated data where found.
+- Remember to use the title generation tool when relevant without being explicitly asked.
+`;
 
   const result = streamText({
     model: selectedModel(model, {}),
@@ -159,6 +161,23 @@ Compare with previous memories to avoid duplicates. Format each memory as a clea
         }),
         execute: async ({ memory }: { memory: string[] }) => {
           return memory || [];
+        },
+      },
+      generateTitle: {
+        description: `Generate a short, descriptive title for the conversation based on the context and content.
+Rules for title generation:
+- Keep it concise (2-6 words)
+- Make it descriptive of the main topic
+- Capture the essence of the conversation
+- Use title case formatting
+- Avoid generic titles like "Chat" or "Conversation"`,
+        parameters: z.object({
+          title: z
+            .string()
+            .describe("The generated title for the conversation"),
+        }),
+        execute: async ({ title }: { title: string }) => {
+          return title;
         },
       },
     },
