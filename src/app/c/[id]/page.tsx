@@ -38,6 +38,7 @@ export default function Page() {
     id: id as string,
     onError(error) {
       toast.error(error.message);
+      console.log("error", error);
     },
     onToolCall({ toolCall }) {
       console.log("Tool call", toolCall);

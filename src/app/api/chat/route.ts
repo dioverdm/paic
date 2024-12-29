@@ -90,15 +90,8 @@ export async function POST(req: Request) {
   const finalSystemPrompt =
     systemPrompt || SYSTEM_PROMPT || "You are a helpful assistant.";
 
-  const result = streamText({
-    model: selectedModel(model, {}),
-    messages: messages.slice(-contextLength), // Use contextLength from settings
-    system: finalSystemPrompt,
-    maxTokens, // Use maxTokens from settings
-    temperature, // Use temperature from settings
-    topP, // Use topP from settings
-    maxSteps: 10,
-    tools: {
+  const tools = [
+    {
       rememberInformation: {
         description: `Extract and store essential information as an array of unique, concise memory strings.
 
@@ -140,7 +133,22 @@ Return the title as a single string.`,
         },
       },
     },
-  });
+  ];
 
-  return result.toDataStreamResponse();
+  try {
+    const result = streamText({
+      model: selectedModel(model),
+      messages: messages.slice(-contextLength), // Use contextLength from settings
+      system: finalSystemPrompt,
+      maxTokens, // Use maxTokens from settings
+      temperature, // Use temperature from settings
+      topP, // Use topP from settings
+      maxSteps: 10,
+      tools: provider === "openai" ? tools : {},
+    });
+
+    return result.toDataStreamResponse();
+  } catch (error) {
+    return new Response((error as Error).message, { status: 500 });
+  }
 }
