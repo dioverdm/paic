@@ -147,12 +147,15 @@ Notes:
     maxSteps: 10,
     tools: {
       rememberInformation: {
-        description: `When you encounter important information that should be remembered, return an array of concise memory strings. Important information includes:
-- User preferences and settings
-- Personal details shared by the user
-- Key decisions or choices made
-- Important facts or context needed for future conversations
-Compare with previous memories to avoid duplicates. Format each memory as a clear, concise string.`,
+        description: `Extract and store essential information as an array of unique, concise memory strings.
+
+Capture only:
+
+User preferences and settings
+Shared personal details
+Key decisions or choices
+Crucial facts or context for future use
+Ensure no duplicates by comparing with existing memories. Return the array of concise memory strings.`,
         parameters: z.object({
           memory: z
             .array(z.string())
@@ -164,13 +167,16 @@ Compare with previous memories to avoid duplicates. Format each memory as a clea
         },
       },
       generateTitle: {
-        description: `Generate a short, descriptive title for the conversation based on the context and content.
-Rules for title generation:
-- Keep it concise (2-6 words)
-- Make it descriptive of the main topic
-- Capture the essence of the conversation
-- Use title case formatting
-- Avoid generic titles like "Chat" or "Conversation"`,
+        description: `Create a concise and descriptive title for the conversation based on its context and content.
+
+Guidelines:
+
+Limit to 2-4 words.
+Clearly describe the main topic.
+Capture the essence of the conversation.
+Use title case formatting.
+Avoid generic titles like "Chat" or "Conversation."
+Return the title as a single string.`,
         parameters: z.object({
           title: z
             .string()

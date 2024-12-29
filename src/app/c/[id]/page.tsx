@@ -12,7 +12,7 @@ import AI_MODELS from "@/app/_components/AIMODELS";
 type ArgsForMemory = { memory: string[] };
 
 export default function Page() {
-  const { addMessage, getChat } = useUserChat();
+  const { addMessage, getChat, updateChatTitle } = useUserChat();
   const [chatUpdate, setChatUpdate] = React.useState(false);
   const [initializeChat, setInitializeChat] = React.useState(false);
   const [model, setModel] = React.useState("OpenAI: GPT-4o-mini");
@@ -53,6 +53,12 @@ export default function Page() {
         console.log(
           "Tool call",
           JSON.stringify((toolCall.args as ArgsForMemory).memory)
+        );
+      }
+      if (toolCall?.toolName === "generateTitle") {
+        updateChatTitle(
+          id as string,
+          (toolCall.args as { title: string }).title
         );
       }
     },

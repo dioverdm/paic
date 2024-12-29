@@ -50,6 +50,10 @@ export default function ChatUI({
                 !message.toolInvocations?.find(
                   (toolInvocation) =>
                     toolInvocation.toolName === "rememberInformation"
+                ) &&
+                !message.toolInvocations?.find(
+                  (toolInvocation) =>
+                    toolInvocation.toolName === "generateTitle"
                 )
             )
             .map((message, index) => (
@@ -70,6 +74,10 @@ export default function ChatUI({
                           !message.toolInvocations?.find(
                             (toolInvocation) =>
                               toolInvocation.toolName === "rememberInformation"
+                          ) &&
+                          !message.toolInvocations?.find(
+                            (toolInvocation) =>
+                              toolInvocation.toolName === "generateTitle"
                           )
                       ).length -
                       1 &&
@@ -80,6 +88,10 @@ export default function ChatUI({
                         !message.toolInvocations?.find(
                           (toolInvocation) =>
                             toolInvocation.toolName === "rememberInformation"
+                        ) &&
+                        !message.toolInvocations?.find(
+                          (toolInvocation) =>
+                            toolInvocation.toolName === "generateTitle"
                         )
                     ).length >= 2 &&
                   id && (
