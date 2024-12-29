@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LifeBuoy, Send } from "lucide-react";
+import { CoffeeIcon, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -89,13 +89,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Static data for other navigation items
   const navSecondary = [
     {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
+      title: "Buy Me a Coffee",
+      url: "https://www.buymeacoffee.com/cwd.harshit",
+      icon: CoffeeIcon,
     },
     {
       title: "Feedback",
-      url: "#",
+      url: "mailto:cwd.harshit911@gmail.com",
       icon: Send,
     },
   ];
