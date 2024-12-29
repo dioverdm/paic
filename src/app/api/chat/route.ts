@@ -90,10 +90,9 @@ export async function POST(req: Request) {
   const finalSystemPrompt =
     systemPrompt || SYSTEM_PROMPT || "You are a helpful assistant.";
 
-  const tools = [
-    {
-      rememberInformation: {
-        description: `Extract and store essential information as an array of unique, concise memory strings.
+  const tools = {
+    rememberInformation: {
+      description: `Extract and store essential information as an array of unique, concise memory strings.
 
 Capture only:
 
@@ -102,18 +101,18 @@ Shared personal details
 Key decisions or choices
 Crucial facts or context for future use
 Ensure no duplicates by comparing with existing memories. Return the array of concise memory strings.`,
-        parameters: z.object({
-          memory: z
-            .array(z.string())
-            .optional()
-            .describe("The info to remember!"),
-        }),
-        execute: async ({ memory }: { memory: string[] }) => {
-          return memory || [];
-        },
+      parameters: z.object({
+        memory: z
+          .array(z.string())
+          .optional()
+          .describe("The info to remember!"),
+      }),
+      execute: async ({ memory }: { memory: string[] }) => {
+        return memory || [];
       },
-      generateTitle: {
-        description: `Create a concise and descriptive title for the conversation based on its context and content.
+    },
+    generateTitle: {
+      description: `Create a concise and descriptive title for the conversation based on its context and content.
 
 Guidelines:
 
@@ -123,17 +122,14 @@ Capture the essence of the conversation.
 Use title case formatting.
 Avoid generic titles like "Chat" or "Conversation."
 Return the title as a single string.`,
-        parameters: z.object({
-          title: z
-            .string()
-            .describe("The generated title for the conversation"),
-        }),
-        execute: async ({ title }: { title: string }) => {
-          return title;
-        },
+      parameters: z.object({
+        title: z.string().describe("The generated title for the conversation"),
+      }),
+      execute: async ({ title }: { title: string }) => {
+        return title;
       },
     },
-  ];
+  };
 
   try {
     const result = streamText({
