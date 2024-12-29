@@ -31,7 +31,7 @@ export default function CommonSettings() {
   const resetSystemPrompt = () => {
     const defaultPrompt = "You are a helpful assistant.";
     setSystemPrompt(defaultPrompt);
-    localStorage.setItem("systemPrompt", defaultPrompt);
+    localStorage.removeItem("systemPrompt");
   };
 
   const updateSetting = (name: string, value: string | number) => {
