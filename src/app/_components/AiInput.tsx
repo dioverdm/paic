@@ -150,6 +150,7 @@ export default function AIInput_10({
             model: AI_MODELS.find((m) => m.name === model)?.value || "",
             provider: AI_MODELS.find((m) => m.name === model)?.provider || "",
             ...settings, // Include all settings in the request
+            memory: localStorage.getItem("previousMemory") || "",
           },
         }
       );

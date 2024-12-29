@@ -1,7 +1,7 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAI as createOpenRouter } from "@ai-sdk/openai";
 import { createOpenAI } from "@ai-sdk/openai";
-import { streamText } from "ai";
+import { generateId, Message, streamText } from "ai";
 import { cookies } from "next/headers";
 import crypto from "crypto";
 import { z } from "zod";
@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     maxTokens,
     temperature,
     topP,
+    memory,
   } = body;
 
   // Get encrypted API key from cookies
@@ -131,10 +132,26 @@ Return the title as a single string.`,
     },
   };
 
+  const messagesWithMemory: Message[] = [
+    ...(provider !== "openrouter"
+      ? [
+          {
+            id: generateId(),
+            role: "system",
+            content: `Remembering information... ${memory}`,
+            createdAt: new Date(),
+          },
+        ]
+      : []),
+    ...messages.slice(-contextLength),
+  ];
+
+  console.log("messagesWithMemory", messagesWithMemory);
+
   try {
     const result = streamText({
       model: selectedModel(model),
-      messages: messages.slice(-contextLength), // Use contextLength from settings
+      messages: messagesWithMemory, // Use contextLength from settings
       system: finalSystemPrompt,
       maxTokens, // Use maxTokens from settings
       temperature, // Use temperature from settings
