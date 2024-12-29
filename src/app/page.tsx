@@ -9,6 +9,7 @@ import { useUserChat } from "@/store/userChat";
 import { useRouter } from "next/navigation";
 import AI_MODELS from "./_components/AIMODELS";
 import { generateId } from "ai";
+import { toast } from "sonner";
 
 export default function Page() {
   const { createChat } = useUserChat();
@@ -31,6 +32,9 @@ export default function Page() {
       setInitialChatCreation(true);
     },
     experimental_throttle: 100,
+    onError(error) {
+      toast.error(error.message);
+    },
   });
 
   useEffect(() => {

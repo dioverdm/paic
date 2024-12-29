@@ -5,7 +5,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface CodeBlockProps {
   language: string;
@@ -44,11 +44,7 @@ export const CodeBlock = memo(function CodeBlock({
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(value);
-    toast({
-      title: "Copied to clipboard",
-      description: "Code has been copied to your clipboard",
-      duration: 2000,
-    });
+    toast.success("Copied to clipboard");
   };
 
   return (

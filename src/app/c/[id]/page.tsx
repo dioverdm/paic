@@ -8,6 +8,7 @@ import Intro from "@/app/_components/Intro";
 import ChatUI from "@/app/_components/ChatUI";
 import AIInput_10 from "@/app/_components/AiInput";
 import AI_MODELS from "@/app/_components/AIMODELS";
+import { toast } from "sonner";
 
 type ArgsForMemory = { memory: string[] };
 
@@ -35,6 +36,9 @@ export default function Page() {
     },
     experimental_throttle: 100,
     id: id as string,
+    onError(error) {
+      toast.error(error.message);
+    },
     onToolCall({ toolCall }) {
       console.log("Tool call", toolCall);
       if (toolCall?.toolName === "rememberInformation") {
