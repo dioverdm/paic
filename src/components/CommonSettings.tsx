@@ -19,10 +19,10 @@ export default function CommonSettings() {
   useEffect(() => {
     // Load settings from localStorage
     setSystemPrompt(localStorage.getItem("systemPrompt") || "");
-    setContextLength(localStorage.getItem("contextLength") || "4");
-    setMaxTokens(localStorage.getItem("maxTokens") || "1000");
-    setTemperature(parseFloat(localStorage.getItem("temperature") || "0.4"));
-    setTopP(parseFloat(localStorage.getItem("topP") || "0.8"));
+    setContextLength(localStorage.getItem("contextLength") || "20");
+    setMaxTokens(localStorage.getItem("maxTokens") || "4000");
+    setTemperature(parseFloat(localStorage.getItem("temperature") || "0.7"));
+    setTopP(parseFloat(localStorage.getItem("topP") || "0.9"));
   }, []);
 
   const saveSystemPrompt = () => {
