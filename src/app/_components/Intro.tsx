@@ -56,7 +56,7 @@ export default function Intro() {
         <FeatureCard
           icon="🔒"
           title="Privacy First"
-          description="Your conversations and data are fully encrypted and private"
+          description="Your conversations and data are stored locally"
         />
         <FeatureCard
           icon="🖼️"
