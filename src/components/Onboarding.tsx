@@ -19,9 +19,9 @@ const userFormSchema = z.object({
 });
 
 const apiFormSchema = z.object({
-  openaiKey: z.string().min(2),
+  openaiKey: z.string().optional(),
   anthropicKey: z.string().optional(),
-  openrouterKey: z.string().optional(),
+  openrouterKey: z.string().min(2),
 });
 
 export default function Onboarding() {
@@ -202,14 +202,14 @@ export default function Onboarding() {
       content: (
         <form onSubmit={handleApiSubmit} className="space-y-4 w-full">
           <div className="space-y-2">
-            <Label htmlFor="openrouterKey">OpenRouter API Key (Optional)</Label>
+            <Label htmlFor="openrouterKey">OpenRouter API Key (Required)</Label>
             <Input {...apiForm.register("openrouterKey")} type="password" />
             {apiForm.formState.errors.openrouterKey && (
               <p className="text-sm text-red-500">OpenAI API key is required</p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="openaiKey">OpenAI API Key (Required)</Label>
+            <Label htmlFor="openaiKey">OpenAI API Key (Optional)</Label>
             <Input {...apiForm.register("openaiKey")} type="password" />
           </div>
           <div className="space-y-2">
