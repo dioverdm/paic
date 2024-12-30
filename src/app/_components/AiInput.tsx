@@ -10,19 +10,28 @@ import {
   Lock,
   Unlock,
   StopCircleIcon,
+  Check,
+  ChevronsUpDown,
 } from "lucide-react";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { useClickOutside } from "@/hooks/use-click-outside";
+import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +41,7 @@ import {
 import { usePathname } from "next/navigation";
 import AI_MODELS from "./AIMODELS";
 import { ChatRequestOptions, CreateMessage, Message } from "ai";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MIN_HEIGHT = 40;
 
@@ -82,6 +92,17 @@ export default function AIInput_10({
 }) {
   const menuRef = useRef<HTMLDivElement & HTMLElement>(null);
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    setModel(value);
+  }, [value, setModel]);
+
+  useEffect(() => {
+    setValue(model);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [state, setState] = useState({
     value: "",
@@ -120,6 +141,9 @@ export default function AIInput_10({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!input) return;
+    if (isLoading) return;
+    if (value === "") return;
     const settings = getSettings();
     append(
       { content: input, role: "user" },
@@ -141,6 +165,9 @@ export default function AIInput_10({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      if (!input) return;
+      if (isLoading) return;
+      if (value === "") return;
       const settings = getSettings();
       append(
         { content: input, role: "user" },
@@ -210,50 +237,80 @@ export default function AIInput_10({
   const anthropic = localStorage.getItem("anthropic");
   const openrouter = localStorage.getItem("openrouter");
 
+  const filteredModels = AI_MODELS.filter((m) => {
+    if (openai && m.provider === "openai") return true;
+    if (anthropic && m.provider === "anthropic") return true;
+    if (openrouter && m.provider === "openrouter") return true;
+    return false;
+  });
+
+  console.log(filteredModels);
+
   return (
     <form className="w-full py-4" onSubmit={handleSubmit}>
       <div className="rounded-xl bg-sidebar">
         <div ref={menuRef}>
           <div className="border-b border-black/10 dark:border-white/10">
             <div className="flex justify-between items-center px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400">
-              <div className="relative" data-model-menu>
-                <Select
-                  value={model}
-                  onValueChange={(value) => {
-                    setModel(value);
-                  }}
-                >
-                  <SelectTrigger className="flex items-center gap-1.5 rounded-lg px-2 py-1">
-                    <Brain className="w-4 h-4 dark:text-white" />
-                    <span className="dark:text-white">{model}</span>
-                  </SelectTrigger>
-                  <SelectContent className="w-64">
-                    <SelectGroup>
-                      {AI_MODELS.filter((m) => {
-                        if (openai && m.provider === "openai") return true;
-                        if (anthropic && m.provider === "anthropic")
-                          return true;
-                        if (openrouter && m.provider === "openrouter")
-                          return true;
-                        return false;
-                      }).map((model) => (
-                        <SelectItem
-                          key={model.name}
-                          value={model.name}
-                          className="flex items-center gap-2"
-                        >
-                          <div className="flex items-center gap-2 flex-1">
-                            {model.icon}
-                            <span>{model.name}</span>
-                          </div>
-                          <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                            {model.description}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+              <div className="relative">
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="flex items-center gap-1.5 rounded-lg px-2 py-1 w-[17rem] justify-between"
+                    >
+                      <Brain className="w-4 h-4 dark:text-white" />
+                      {value
+                        ? filteredModels.find((model) => model.name === value)
+                            ?.name || "Select model..."
+                        : "Select model..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[20rem] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search model..." />
+                      <CommandList>
+                        <CommandEmpty>No model found.</CommandEmpty>
+                        <CommandGroup>
+                          <ScrollArea className="h-[15rem]">
+                            {filteredModels?.map((model) => (
+                              <CommandItem
+                                key={model.name}
+                                value={model.name}
+                                onSelect={(currentValue) => {
+                                  setValue(
+                                    currentValue === value ? "" : currentValue
+                                  );
+                                  setOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    value === model.name
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                <div>
+                                  <div className="font-medium">
+                                    {model.name}
+                                  </div>
+                                  <div className="text-xs text-black/50 dark:text-white/50">
+                                    {model.description}
+                                  </div>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </ScrollArea>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <button
@@ -377,11 +434,12 @@ export default function AIInput_10({
                 type="submit"
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl bg-black/5 dark:bg-white/5 p-1"
                 title="Send"
+                disabled={value === ""}
               >
                 <ArrowRight
                   className={cn(
                     "w-4 h-4 dark:text-white",
-                    state.value ? "opacity-100" : "opacity-30"
+                    state.value && value !== "" ? "opacity-100" : "opacity-30"
                   )}
                 />
               </button>

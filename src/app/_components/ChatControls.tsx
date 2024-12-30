@@ -45,7 +45,7 @@ export default function MinimalChatControls({
           {displayName}
         </SelectTrigger>
         <SelectContent className="min-w-[140px]">
-          <ScrollArea className="h-full max-h-64">
+          <ScrollArea className="h-64">
             {AI_MODELS.map((model) => (
               <SelectItem
                 key={model.name}
