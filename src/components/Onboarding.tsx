@@ -53,6 +53,7 @@ export default function Onboarding() {
 
   const handleApiSubmit = apiForm.handleSubmit(async (data) => {
     setLoading(true);
+    const toastId = toast.loading("Saving API keys...");
     try {
       if (data.openaiKey) {
         localStorage.setItem("openai", "true");
@@ -99,12 +100,14 @@ export default function Onboarding() {
           throw new Error("Failed to save API key");
         }
       }
+      toast.success("API keys saved successfully", { id: toastId });
     } catch (error) {
       console.error("Error saving API key:", error);
-      toast.error("Error saving API key");
+      toast.error("Error saving API key", { id: toastId });
     } finally {
       setLoading(false);
       setOnboardingComplete(true);
+      window.location.reload();
     }
   });
 
