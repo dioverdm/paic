@@ -100,11 +100,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
   ];
 
-  const user = {
-    name: "Harshit Sharma",
-    email: "cwd.harshit911@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
-  };
+  const userDetailLocal = localStorage.getItem("user-details");
+
+  const userDetails = userDetailLocal ? JSON.parse(userDetailLocal) : null;
+
+  const user = userDetailLocal
+    ? {
+        name: userDetails.name,
+        email: userDetails.email,
+        avatar: "/avatars/shadcn.jpg",
+      }
+    : {
+        name: "Harshit Sharma",
+        email: "cwd.harshit911@gmail.com",
+        avatar: "/avatars/shadcn.jpg",
+      };
 
   return (
     <Sidebar variant="inset" {...props}>

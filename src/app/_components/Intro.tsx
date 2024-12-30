@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 // import { BackgroundGrid } from "./BackgroundGrid";
 
 export default function Intro() {
+  const userDetailsLocal = localStorage.getItem("user-details");
+  const userDetails = userDetailsLocal ? JSON.parse(userDetailsLocal) : null;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,7 +33,10 @@ export default function Intro() {
         className="flex flex-col gap-2 md:gap-3"
       >
         <h3 className="text-lg md:text-xl font-medium text-muted-foreground">
-          Hi, <span className="font-bold">Clever Developer</span>
+          Hi,{" "}
+          <span className="font-bold">
+            {userDetails ? userDetails.orgName : "Clever Developer"}
+          </span>
         </h3>
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 bg-gradient-to-r from-indigo-500 to-blue-600 bg-clip-text text-transparent">
           Can I help you with anything?
