@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Slider } from "./ui/slider";
 import { RotateCcw, SaveIcon } from "lucide-react";
+import { toast } from "sonner";
 
 export default function CommonSettings() {
   const [systemPrompt, setSystemPrompt] = useState("");
@@ -25,7 +26,9 @@ export default function CommonSettings() {
   }, []);
 
   const saveSystemPrompt = () => {
+    if (systemPrompt === "You are a helpful assistant.") return;
     localStorage.setItem("systemPrompt", systemPrompt);
+    toast("System prompt saved successfully");
   };
 
   const resetSystemPrompt = () => {
