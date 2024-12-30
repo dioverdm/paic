@@ -8,6 +8,12 @@ const AI_MODELS = [
     provider: "openai",
   },
   {
+    name: "OpenAI: GPT-4",
+    value: "gpt-4",
+    description: "Standard GPT-4 model",
+    provider: "openai",
+  },
+  {
     name: "OpenAI: GPT-4 Turbo",
     value: "gpt-4-turbo",
     description: "Fast GPT-4 for performance",
@@ -110,9 +116,39 @@ const AI_MODELS = [
     provider: "openrouter",
   },
   {
-    name: "Anthropic: Claude Instant 1",
-    value: "anthropic/claude-instant-1",
-    description: "Quick response AI assistant",
+    name: "Google: Gemini Flash 2.0 (FREE)",
+    value: "google/gemini-2.0-flash-exp:free",
+    description: "Fast experimental AI model",
+    provider: "openrouter",
+  },
+  {
+    name: "Microsoft: Phi-3 Medium 128k (FREE)",
+    value: "microsoft/phi-3-medium-128k-instruct:free",
+    description: "Free versatile AI model",
+    provider: "openrouter",
+  },
+  {
+    name: "Meta: Llama 3.2 11B Vision (FREE)",
+    value: "meta-llama/llama-3.2-11b-vision-instruct:free",
+    description: "Free vision-capable model",
+    provider: "openrouter",
+  },
+  {
+    name: "Google: Gemini Flash 1.5 8B Exp",
+    value: "google/gemini-flash-1.5-8b-exp",
+    description: "Experimental fast AI model",
+    provider: "openrouter",
+  },
+  {
+    name: "OpenChat: OpenChat 7B (FREE)",
+    value: "openchat/openchat-7b:free",
+    description: "Free open-source chatbot",
+    provider: "openrouter",
+  },
+  {
+    name: "HuggingFace: Zephyr 7B Beta (FREE)",
+    value: "huggingfaceh4/zephyr-7b-beta:free",
+    description: "Free experimental AI model",
     provider: "openrouter",
   },
 ].map((model) => ({ ...model, icon: <Brain className="w-4 h-4" /> }));
