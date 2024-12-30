@@ -39,7 +39,7 @@ const AI_MODELS = [
   },
   {
     name: "Anthropic: Claude 3 Opus",
-    value: "claude-3-5-opus-latest",
+    value: "claude-3-opus-latest",
     description: "Supreme intelligence master model",
     provider: "anthropic",
   },
