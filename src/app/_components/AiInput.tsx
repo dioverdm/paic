@@ -206,6 +206,10 @@ export default function AIInput_10({
     }
   }, [textareaRef]);
 
+  const openai = localStorage.getItem("openai");
+  const anthropic = localStorage.getItem("anthropic");
+  const openrouter = localStorage.getItem("openrouter");
+
   return (
     <form className="w-full py-4" onSubmit={handleSubmit}>
       <div className="rounded-xl bg-sidebar">
@@ -225,7 +229,14 @@ export default function AIInput_10({
                   </SelectTrigger>
                   <SelectContent className="w-64">
                     <SelectGroup>
-                      {AI_MODELS.map((model) => (
+                      {AI_MODELS.filter((m) => {
+                        if (openai && m.provider === "openai") return true;
+                        if (anthropic && m.provider === "anthropic")
+                          return true;
+                        if (openrouter && m.provider === "openrouter")
+                          return true;
+                        return false;
+                      }).map((model) => (
                         <SelectItem
                           key={model.name}
                           value={model.name}
