@@ -202,20 +202,21 @@ export default function Onboarding() {
       content: (
         <form onSubmit={handleApiSubmit} className="space-y-4 w-full">
           <div className="space-y-2">
-            <Label htmlFor="openaiKey">OpenAI API Key (Required)</Label>
-            <Input {...apiForm.register("openaiKey")} type="password" />
-            {apiForm.formState.errors.openaiKey && (
+            <Label htmlFor="openrouterKey">OpenRouter API Key (Optional)</Label>
+            <Input {...apiForm.register("openrouterKey")} type="password" />
+            {apiForm.formState.errors.openrouterKey && (
               <p className="text-sm text-red-500">OpenAI API key is required</p>
             )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="openaiKey">OpenAI API Key (Required)</Label>
+            <Input {...apiForm.register("openaiKey")} type="password" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="anthropicKey">Anthropic API Key (Optional)</Label>
             <Input {...apiForm.register("anthropicKey")} type="password" />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="openrouterKey">OpenRouter API Key (Optional)</Label>
-            <Input {...apiForm.register("openrouterKey")} type="password" />
-          </div>
+
           <div className="text-sm text-muted-foreground mb-4">
             Your API keys are stored securely in your browser&apos;s local
             storage and never sent to our servers.
