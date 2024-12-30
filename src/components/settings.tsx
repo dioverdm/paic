@@ -62,7 +62,7 @@ export function SettingsDialog({
           Customize your settings here.
         </DialogDescription>
         <SidebarProvider className="items-start">
-          <Sidebar collapsible="none" className="hidden md:flex">
+          <Sidebar collapsible="none" className="hidden md:flex w-40">
             <SidebarContent className="">
               <SidebarGroup>
                 <SidebarGroupContent>
