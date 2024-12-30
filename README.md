@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LumeAI: Cutting-Edge AI-Powered Chat Application
 
-## Getting Started
+LumeAI is a state-of-the-art, multimodal chat application built with Next.js, leveraging the latest advancements in AI to deliver a smooth and engaging user experience.
 
-First, run the development server:
+![LumeAI Logo](https://www.lumeai.xyz/og.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Real-time chat interface with AI-powered responses
+- Support for multiple AI models (OpenAI GPT-4, GPT-3.5, Anthropic Claude, Google PaLM)
+- File attachment support with preview functionality
+- Markdown rendering for rich text formatting
+- Code syntax highlighting
+- Responsive design with a resizable sidebar
+- Dark mode support
+- User preferences and settings management
+- Token usage tracking and visualization
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js (v14 or later)
+- npm or yarn
+- An [OpenRouter](https://openrouter.ai/) API key
 
-## Learn More
+## Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   git clone https://github.com/c-w-d-harshit/lume-ai.git
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. Change to the project directory:
 
-## Deploy on Vercel
+   ```bash
+   cd lume-ai
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Install the dependencies:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+4. Run the development server:
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. Open your browser and navigate to `http://localhost:3000` to see the application running.
+
+## Deployment
+
+To deploy LumeAI, you can use platforms like Vercel, Netlify, or AWS. Make sure to set the necessary environment variables for your production environment.
+
+## Contributing
+
+We welcome contributions to LumeAI! If you'd like to contribute, please follow these steps:
+
+1. Fork the repository
+2. Create a new branch for your feature or bug fix
+3. Make your changes and commit them with descriptive messages
+4. Push your changes to your forked repository
+5. Submit a pull request to the main repository
+
+## License
+
+LumeAI is open-source software licensed under the [MIT License](LICENSE).
+
+## Contact
+
+If you have any questions, suggestions, or feedback, please feel free to reach out to us at [cwd.harshit911@gmail.com](mailto:cwd.harshit911@gmail.com).
+
+Happy chatting with LumeAI!
