@@ -49,7 +49,7 @@ export const MessageItem = memo(function MessageItem({
       >
         <div
           className={cn(
-            "prose dark:prose-invert prose-pre:p-4 max-w-[100ch]",
+            "prose dark:prose-invert prose-pre:p-4 prose-pre:bg-background prose-tr:border-border prose-hr:border-border max-w-[100ch]",
             message.role === "user"
               ? "text-primary-foreground whitespace-pre-wrap"
               : "w-full"
