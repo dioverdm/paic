@@ -24,7 +24,8 @@ export default function Page() {
       },
       experimental_throttle: 100,
       onError(error) {
-        toast.error(error.message);
+        toast.error("An error occurred. Please try refreshing the page.");
+        console.error(error);
       },
     });
 

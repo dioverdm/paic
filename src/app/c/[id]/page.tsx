@@ -37,8 +37,8 @@ export default function Page() {
     experimental_throttle: 100,
     id: id as string,
     onError(error) {
-      toast.error(error.message);
-      console.log("error", error);
+      toast.error("An error occurred. Please try refreshing the page.");
+      console.error(error);
     },
     onToolCall({ toolCall }) {
       console.log("Tool call", toolCall);

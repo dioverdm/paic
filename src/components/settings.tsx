@@ -36,6 +36,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import CommonSettings from "./CommonSettings";
 import { ModelSettings } from "./ModelSettings";
 import MemorySettings from "./MemorySettings";
+import PluginSettings from "./PluginSettings";
 
 const data = {
   nav: [
@@ -111,6 +112,8 @@ export function SettingsDialog({
                     return <ModelSettings />;
                   case "Memory":
                     return <MemorySettings />;
+                  case "Plugins":
+                    return <PluginSettings />;
                   default:
                     return null;
                 }

@@ -1,7 +1,14 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAI as createOpenRouter } from "@ai-sdk/openai";
 import { createOpenAI } from "@ai-sdk/openai";
-import { generateId, Message, streamText } from "ai";
+import {
+  generateId,
+  InvalidToolArgumentsError,
+  Message,
+  NoSuchToolError,
+  streamText,
+  ToolExecutionError,
+} from "ai";
 import { cookies } from "next/headers";
 import crypto from "crypto";
 import { z } from "zod";
@@ -39,6 +46,7 @@ export async function POST(req: Request) {
     temperature,
     topP,
     memory,
+    plugins,
   } = body;
 
   // Get encrypted API key from cookies
@@ -92,7 +100,17 @@ export async function POST(req: Request) {
   const finalSystemPrompt =
     systemPrompt || SYSTEM_PROMPT || "You are a helpful assistant.";
 
-  const tools = {
+  const tools:
+    | {
+        [key: string]: {
+          description: string;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          parameters: z.ZodObject<any>;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          execute: (params: any) => Promise<any>;
+        };
+      }
+    | undefined = {
     rememberInformation: {
       description: `Extract and store essential information as an array of unique, concise memory strings.
 
@@ -131,31 +149,6 @@ Return the title as a single string.`,
         return title;
       },
     },
-    webSearch: {
-      description: `Perform a web search using Google Custom Search API and return relevant results.
-      
-    Guidelines:
-    - Return top search results
-    - Include title and snippet for each result
-    - Filter for relevant content only`,
-      parameters: z.object({
-        query: z.string().describe("The search query to execute"),
-      }),
-      execute: async ({ query }: { query: string }) => {
-        const res = await fetch(
-          `https://www.googleapis.com/customsearch/v1?key=${
-            process.env.GOOGLE_API_KEY
-          }&cx=${process.env.GOOGLE_CX}&q=${encodeURIComponent(query)}`,
-          {
-            headers: {
-              "Accept-Encoding": "gzip",
-            },
-          }
-        );
-        const data = await res.json();
-        return data;
-      },
-    },
     getCurrentDate: {
       description: `Get the current date and time in ISO format.
       
@@ -171,7 +164,19 @@ Return the title as a single string.`,
       },
     },
     fetchWebPage: {
-      description: `Using this tool you can fetch the content of a web page.`,
+      description: `Safely fetch and extract content from a specified web page URL. DONT USE IT IF THE URL IS NOT PROVIDED
+
+      Guidelines:
+      - Only fetch from valid, public URLs
+      - Strips script, style, and meta tags for cleaner content
+      - Returns parsed HTML content
+      - Uses browser-like User-Agent
+      - Handles errors gracefully
+
+      Do not use for:
+      - Web searching (use webSearch tool instead)
+      - Accessing private/authenticated content
+      - Scraping restricted content`,
       parameters: z.object({
         url: z.string().url().describe("The URL to fetch content from"),
       }),
@@ -215,6 +220,49 @@ Return the title as a single string.`,
     },
   };
 
+  const pluginsArray: {
+    [key: string]: {
+      enabled: boolean;
+      apiKey: string;
+      cx: string;
+    };
+  } = JSON.parse(plugins);
+
+  console.log("pluginsArray", pluginsArray);
+
+  // Add plugin tools
+  const webSearch = {
+    description: `Perform a web search using Google Custom Search API and return relevant results.
+      
+    Guidelines:
+    - Return top search results
+    - Include title and snippet for each result
+    - Filter for relevant content only`,
+    parameters: z.object({
+      query: z.string().describe("The search query to execute"),
+    }),
+    execute: async ({ query }: { query: string }) => {
+      const res = await fetch(
+        `https://www.googleapis.com/customsearch/v1?key=${
+          pluginsArray["google-search"].apiKey
+        }&cx=${pluginsArray["google-search"].cx}&q=${encodeURIComponent(
+          query
+        )}`,
+        {
+          headers: {
+            "Accept-Encoding": "gzip",
+          },
+        }
+      );
+      const data = await res.json();
+      return data;
+    },
+  };
+
+  if (pluginsArray["google-search"].enabled) {
+    tools.webSearch = webSearch;
+  }
+
   const messagesWithMemory: Message[] = [
     ...(provider !== "openrouter"
       ? [
@@ -239,9 +287,22 @@ Return the title as a single string.`,
       topP, // Use topP from settings
       maxSteps: 10,
       tools: provider !== "anthropic" ? tools : {},
+      // toolChoice: {}
     });
 
-    return result.toDataStreamResponse();
+    return result.toDataStreamResponse({
+      getErrorMessage: (error) => {
+        if (NoSuchToolError.isInstance(error)) {
+          return "The model tried to call a unknown tool.";
+        } else if (InvalidToolArgumentsError.isInstance(error)) {
+          return "The model called a tool with invalid arguments.";
+        } else if (ToolExecutionError.isInstance(error)) {
+          return "An error occurred during tool execution.";
+        } else {
+          return "An unknown error occurred.";
+        }
+      },
+    });
   } catch (error) {
     return new Response((error as Error).message, { status: 500 });
   }
