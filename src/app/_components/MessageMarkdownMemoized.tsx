@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 function parseMarkdownIntoBlocks(markdown: string): string[] {
   const tokens = marked.lexer(markdown);
@@ -64,6 +65,18 @@ const MemoizedMarkdownBlock = memo(
           },
           th({ children }) {
             return <TableHead>{children}</TableHead>;
+          },
+          a({ children, href }) {
+            return (
+              <Link
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                {children}
+              </Link>
+            );
           },
         }}
       >
