@@ -220,47 +220,47 @@ Return the title as a single string.`,
     },
   };
 
-  const pluginsArray: {
-    [key: string]: {
-      enabled: boolean;
-      apiKey: string;
-      cx: string;
-    };
-  } = JSON.parse(plugins);
+  if (plugins) {
+    const pluginsArray: {
+      [key: string]: {
+        enabled: boolean;
+        apiKey: string;
+        cx: string;
+      };
+    } = JSON.parse(plugins);
 
-  console.log("pluginsArray", pluginsArray);
-
-  // Add plugin tools
-  const webSearch = {
-    description: `Perform a web search using Google Custom Search API and return relevant results.
+    // Add plugin tools
+    const webSearch = {
+      description: `Perform a web search using Google Custom Search API and return relevant results.
       
     Guidelines:
     - Return top search results
     - Include title and snippet for each result
     - Filter for relevant content only`,
-    parameters: z.object({
-      query: z.string().describe("The search query to execute"),
-    }),
-    execute: async ({ query }: { query: string }) => {
-      const res = await fetch(
-        `https://www.googleapis.com/customsearch/v1?key=${
-          pluginsArray["google-search"].apiKey
-        }&cx=${pluginsArray["google-search"].cx}&q=${encodeURIComponent(
-          query
-        )}`,
-        {
-          headers: {
-            "Accept-Encoding": "gzip",
-          },
-        }
-      );
-      const data = await res.json();
-      return data;
-    },
-  };
+      parameters: z.object({
+        query: z.string().describe("The search query to execute"),
+      }),
+      execute: async ({ query }: { query: string }) => {
+        const res = await fetch(
+          `https://www.googleapis.com/customsearch/v1?key=${
+            pluginsArray["google-search"].apiKey
+          }&cx=${pluginsArray["google-search"].cx}&q=${encodeURIComponent(
+            query
+          )}`,
+          {
+            headers: {
+              "Accept-Encoding": "gzip",
+            },
+          }
+        );
+        const data = await res.json();
+        return data;
+      },
+    };
 
-  if (pluginsArray["google-search"].enabled) {
-    tools.webSearch = webSearch;
+    if (pluginsArray["google-search"].enabled) {
+      tools.webSearch = webSearch;
+    }
   }
 
   const messagesWithMemory: Message[] = [
