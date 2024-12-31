@@ -5,6 +5,7 @@ import { generateId, Message, streamText } from "ai";
 import { cookies } from "next/headers";
 import crypto from "crypto";
 import { z } from "zod";
+import { JSDOM } from "jsdom";
 
 // Helper function to derive a 32-byte key
 const deriveKey = (secret: string): Buffer => {
@@ -128,6 +129,83 @@ Return the title as a single string.`,
       }),
       execute: async ({ title }: { title: string }) => {
         return title;
+      },
+    },
+    webSearch: {
+      description: `Perform a web search using Google Custom Search API and return relevant results.
+      
+    Guidelines:
+    - Return top search results
+    - Include title and snippet for each result
+    - Filter for relevant content only`,
+      parameters: z.object({
+        query: z.string().describe("The search query to execute"),
+      }),
+      execute: async ({ query }: { query: string }) => {
+        const res = await fetch(
+          `https://www.googleapis.com/customsearch/v1?key=${
+            process.env.GOOGLE_API_KEY
+          }&cx=${process.env.GOOGLE_CX}&q=${encodeURIComponent(query)}`
+        );
+        const data = await res.json();
+        return data;
+      },
+    },
+    getCurrentDate: {
+      description: `Get the current date and time in ISO format.
+      
+      Returns the current date/time as a string.`,
+      parameters: z.object({
+        format: z
+          .string()
+          .optional()
+          .describe("Optional date format specification"),
+      }),
+      execute: async () => {
+        return new Date().toISOString();
+      },
+    },
+    fetchWebPage: {
+      description: `Using this tool you can fetch the content of a web page.`,
+      parameters: z.object({
+        url: z.string().url().describe("The URL to fetch content from"),
+      }),
+      execute: async ({ url }: { url: string }) => {
+        const response = await fetch(url, {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+          },
+        });
+        if (!response.ok) {
+          return `Failed to fetch: ${response.status}`;
+        }
+        const html = await response.text();
+
+        // Create a DOM parser
+        const dom = new JSDOM(html);
+        const document = dom.window.document;
+
+        // // Remove all script tags
+        // const scripts = document.getElementsByTagName("script");
+        // while (scripts.length > 0) {
+        //   scripts[0].parentNode?.removeChild(scripts[0]);
+        // }
+
+        // Remove all style tags
+        const styles = document.getElementsByTagName("style");
+        while (styles.length > 0) {
+          styles[0].parentNode?.removeChild(styles[0]);
+        }
+
+        // Remove all meta tags
+        const meta = document.getElementsByTagName("meta");
+        while (meta.length > 0) {
+          meta[0].parentNode?.removeChild(meta[0]);
+        }
+
+        // Get the cleaned HTML
+        return document.documentElement.outerHTML;
       },
     },
   };
