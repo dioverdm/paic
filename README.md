@@ -1,72 +1,80 @@
 # LumeAI: Cutting-Edge AI-Powered Chat Application
 
-LumeAI is a state-of-the-art, multimodal chat application built with Next.js, leveraging the latest advancements in AI to deliver a smooth and engaging user experience.
+LumeAI is a state-of-the-art chat application built with Next.js 15, featuring multiple AI model support and advanced conversation capabilities.
 
 ![LumeAI Logo](https://www.lumeai.xyz/og.png)
 
 ## Features
 
-- Real-time chat interface with AI-powered responses
-- Support for multiple AI models (OpenAI GPT-4, GPT-3.5, Anthropic Claude, Google PaLM)
-- File attachment support with preview functionality
-- Markdown rendering for rich text formatting
-- Code syntax highlighting
-- Responsive design with a resizable sidebar
+- Seamless integration with multiple AI providers (OpenAI, Anthropic, OpenRouter)
+- Advanced memory system for contextual conversations
+- Dynamic system prompts and conversation settings
+- Web search capabilities with Google Custom Search integration
+- Web page content fetching and processing
+- Real-time conversation title generation
+- Adjustable context length and token limits
+- Temperature and Top-P parameter controls
+- Secure API key encryption
+- Modern, responsive interface
 - Dark mode support
-- User preferences and settings management
-- Token usage tracking and visualization
 
 ## Prerequisites
 
-- Node.js (v14 or later)
-- npm or yarn
-- An [OpenRouter](https://openrouter.ai/) API key
+- Node.js (v16 or later)
+- pnpm (v8 or later)
+- API keys for your chosen providers:
+  - OpenAI
+  - Anthropic
+  - OpenRouter
+- Google API key and Custom Search Engine ID (for web search)
+- Environment variables for encryption and system prompts
 
 ## Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/c-w-d-harshit/lume-ai.git
+   git clone https://github.com/c-w-d-harshit/lume-ai-v2.git
    ```
 
 2. Change to the project directory:
 
    ```bash
-   cd lume-ai
+   cd lume-ai-v2
    ```
 
 3. Install the dependencies:
 
    ```bash
-   npm install
-   # or
-   yarn install
+   pnpm install
    ```
 
-4. Run the development server:
+4. Set up your environment variables:
+   Create a `.env.local` file with:
+
+   ```env
+   ENCRYPTION_SECRET_KEY=your_encryption_key
+   SYSTEM_PROMPT={"SYSTEM_PROMPT":"your_default_system_prompt"}
+   GOOGLE_API_KEY=your_google_api_key
+   GOOGLE_CX=your_google_custom_search_id
+   ```
+
+5. Run the development server:
 
    ```bash
-   npm run dev
-   # or
-   yarn dev
+   pnpm dev
    ```
 
-5. Open your browser and navigate to `http://localhost:3000` to see the application running.
+## Usage
 
-## Deployment
-
-To deploy LumeAI, you can use platforms like Vercel, Netlify, or AWS. Make sure to set the necessary environment variables for your production environment.
+1. Configure your API keys in the settings panel
+2. Select your preferred AI provider and model
+3. Adjust conversation settings like context length and temperature
+4. Start chatting with advanced features like web search and memory
 
 ## Contributing
 
-We welcome contributions to LumeAI! If you'd like to contribute, please follow these steps:
-
-1. Fork the repository
-2. Create a new branch for your feature or bug fix
-3. Make your changes and commit them with descriptive messages
-4. Push your changes to your forked repository
-5. Submit a pull request to the main repository
+We welcome contributions! Please feel free to submit pull requests or open issues for any bugs or feature requests.
 
 ## License
 
@@ -74,6 +82,4 @@ LumeAI is open-source software licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-If you have any questions, suggestions, or feedback, please feel free to reach out to us at [cwd.harshit911@gmail.com](mailto:cwd.harshit911@gmail.com).
-
-Happy chatting with LumeAI!
+For questions or feedback, reach out to [cwd.harshit911@gmail.com](mailto:cwd.harshit911@gmail.com).
