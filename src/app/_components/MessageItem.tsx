@@ -55,7 +55,10 @@ export const MessageItem = memo(function MessageItem({
               : "w-full"
           )}
         >
-          <MarkdownContent content={message.content} id={message.id} />
+          <MarkdownContent
+            content={message.content !== "" ? message.content : "Thinking..."}
+            id={message.id}
+          />
         </div>
         <div className="flex justify-end">
           {message.experimental_attachments &&

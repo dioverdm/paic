@@ -43,31 +43,35 @@ export default function ChatUI({
     >
       <div className="flex-1 overflow-y-auto">
         <div className="w-full mx-auto space-y-6">
-          {messages.map((message, index) => (
-            <div key={message.id} className="w-full">
-              <MessageItem
-                key={message.id}
-                message={message}
-                isLoading={isLoading && index === messages.length - 1}
-              />
+          {messages
+            .filter((m) => !(m.content === "" && !isLoading))
+            .map((message, index) => (
+              <div key={message.id} className="w-full">
+                <MessageItem
+                  key={message.id}
+                  message={message}
+                  isLoading={isLoading && index === messages.length - 1}
+                />
 
-              {message.role === "assistant" &&
-                !isLoading &&
-                index === messages.length - 1 &&
-                messages.length >= 2 &&
-                id && (
-                  <ChatControls
-                    selectedModel={
-                      chat?.messages.find((i) => i.id === message.id)?.model ||
-                      ""
-                    }
-                    content={message.content}
-                    reload={reload}
-                    experimental_attachments={message.experimental_attachments}
-                  />
-                )}
-            </div>
-          ))}
+                {message.role === "assistant" &&
+                  !isLoading &&
+                  index === messages.length - 1 &&
+                  messages.length >= 2 &&
+                  id && (
+                    <ChatControls
+                      selectedModel={
+                        chat?.messages.find((i) => i.id === message.id)
+                          ?.model || ""
+                      }
+                      content={message.content}
+                      reload={reload}
+                      experimental_attachments={
+                        message.experimental_attachments
+                      }
+                    />
+                  )}
+              </div>
+            ))}
 
           <div ref={messagesEndRef} />
         </div>
