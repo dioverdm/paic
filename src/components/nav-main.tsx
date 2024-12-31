@@ -101,7 +101,6 @@ export function NavMain({
                           <p className="truncate">{item.title}</p>
                         )}
                       </Link>
-                      {/* {hover && whatHover === item.id && ( */}
                       <DropdownMenu>
                         <DropdownMenuTrigger
                           asChild
@@ -139,7 +138,6 @@ export function NavMain({
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      {/* )} */}
                     </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
