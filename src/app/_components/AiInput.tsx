@@ -259,7 +259,7 @@ export default function AIInput_10({
                       variant="outline"
                       role="combobox"
                       aria-expanded={open}
-                      className="flex items-center gap-1.5 rounded-lg px-2 py-1 w-[17rem] justify-between"
+                      className="flex items-center gap-1.5 rounded-lg px-2 py-1 w-fit justify-between"
                     >
                       <Brain className="w-4 h-4 dark:text-white" />
                       {value

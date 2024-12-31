@@ -32,9 +32,9 @@ interface ChatGroup {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [navMain, setNavMain] = useState<ChatGroup[]>([]);
   const { id } = useParams();
-  const { getAllChats } = useUserChat();
+  const chats = useUserChat((state) => state.chat); // Change this line
+
   useEffect(() => {
-    const chats = getAllChats();
     // Group chats by date
     const today = new Date();
     const yesterday = new Date(today);
@@ -84,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }));
 
     setNavMain(filteredGroups);
-  }, [getAllChats, id]);
+  }, [chats, id]); // Change dependency array to use chats
 
   // Static data for other navigation items
   const navSecondary = [

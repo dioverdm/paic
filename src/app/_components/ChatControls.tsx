@@ -41,10 +41,10 @@ export default function MinimalChatControls({
           setModel(value);
         }}
       >
-        <SelectTrigger className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground max-w-40">
+        <SelectTrigger className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground w-fit">
           {displayName}
         </SelectTrigger>
-        <SelectContent className="min-w-[140px]">
+        <SelectContent className="w-[14rem]">
           <ScrollArea className="h-64">
             {AI_MODELS.map((model) => (
               <SelectItem

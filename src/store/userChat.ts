@@ -100,7 +100,7 @@ export const useUserChat = create<ChatState>()(
       updateChatTitle: (id: string, title: string) => {
         set((state) => ({
           chat: state.chat.map((chat) =>
-            chat.id === id ? { ...chat, title } : chat
+            chat.id === id ? { ...chat, title, updatedAt: new Date() } : chat
           ),
         }));
       },

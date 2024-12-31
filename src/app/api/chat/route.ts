@@ -157,7 +157,7 @@ Return the title as a single string.`,
       temperature, // Use temperature from settings
       topP, // Use topP from settings
       maxSteps: 10,
-      tools: provider === "openai" ? tools : {},
+      tools: provider !== "anthropic" ? tools : {},
     });
 
     return result.toDataStreamResponse();
