@@ -41,6 +41,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     yesterday.setDate(yesterday.getDate() - 1);
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const prevMonthStart = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      1
+    );
+    const prevMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
 
     const groupedChats: ChatGroup[] = [
       {
@@ -53,6 +59,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: "Previous 30 Days",
+        items: [],
+      },
+      {
+        title: "Previous Month",
         items: [],
       },
     ];
@@ -72,6 +82,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         groupedChats[1].items.push(chatItem);
       } else if (chatDate >= thirtyDaysAgo) {
         groupedChats[2].items.push(chatItem);
+      } else if (chatDate >= prevMonthStart && chatDate <= prevMonthEnd) {
+        groupedChats[3].items.push(chatItem);
       }
     });
 
@@ -125,9 +137,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} />
-        <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
+        <NavSecondary items={navSecondary} className="" />
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />

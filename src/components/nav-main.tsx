@@ -31,7 +31,7 @@ export function NavMain({
     <>
       {items.map((item) => (
         <SidebarGroup key={item.title}>
-          <SidebarGroupLabel className="sticky top-0">
+          <SidebarGroupLabel className="sticky top-0 z-20 bg-sidebar">
             {item.title}
           </SidebarGroupLabel>
           <SidebarGroupContent>
