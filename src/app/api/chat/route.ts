@@ -146,8 +146,6 @@ Return the title as a single string.`,
     ...messages.slice(-contextLength),
   ];
 
-  console.log("messagesWithMemory", messagesWithMemory);
-
   try {
     const result = streamText({
       model: selectedModel(model),
