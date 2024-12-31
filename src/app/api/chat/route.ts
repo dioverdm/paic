@@ -145,7 +145,12 @@ Return the title as a single string.`,
         const res = await fetch(
           `https://www.googleapis.com/customsearch/v1?key=${
             process.env.GOOGLE_API_KEY
-          }&cx=${process.env.GOOGLE_CX}&q=${encodeURIComponent(query)}`
+          }&cx=${process.env.GOOGLE_CX}&q=${encodeURIComponent(query)}`,
+          {
+            headers: {
+              "Accept-Encoding": "gzip",
+            },
+          }
         );
         const data = await res.json();
         return data;
