@@ -10,6 +10,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Check, ChevronDown, Info } from "lucide-react";
+import { toast } from "sonner";
 
 // Remove the crypto import and encrypt function as they're now handled by the API
 
@@ -64,6 +65,8 @@ export function ModelSettings() {
           localStorage.setItem("openrouter", "true");
           break;
       }
+
+      toast.success("API key saved successfully");
 
       // You might want to add a success toast here
     } catch (error) {
