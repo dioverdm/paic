@@ -18,6 +18,19 @@ LumeAI is a state-of-the-art chat application built with Next.js 15, featuring m
 - Modern, responsive interface
 - Dark mode support
 
+## Available Tools
+
+LumeAI comes with several built-in tools that enhance the chat experience:
+
+- **Remember Information**: Stores essential information like user preferences and key decisions
+- **Title Generation**: Automatically creates concise, contextual titles for conversations
+- **Date/Time**: Provides current date and time in ISO format
+- **Hacker News**: Retrieves top stories from Hacker News
+- **Calculator**: Performs basic mathematical calculations
+- **Web Search**: Integration with Google Custom Search (requires API key)
+- **Web Scraping**: Extracts content from web pages (requires Firecrawl API key)
+- **Bing Search**: Alternative web search using Bing API (requires API key)
+
 ## Prerequisites
 
 - Node.js (v16 or later)
