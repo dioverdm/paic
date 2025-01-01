@@ -245,8 +245,6 @@ export default function AIInput_10({
     return false;
   });
 
-  console.log(filteredModels);
-
   return (
     <form className="w-full py-4" onSubmit={handleSubmit}>
       <div className="rounded-xl bg-sidebar">

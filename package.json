@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@agentic/bing": "^7.2.0",
+    "@agentic/calculator": "^7.2.0",
+    "@agentic/firecrawl": "^7.2.0",
+    "@agentic/hacker-news": "^7.2.0",
     "@ai-sdk/anthropic": "^1.0.5",
     "@ai-sdk/openai": "^1.0.10",
     "@hookform/resolvers": "^3.9.1",

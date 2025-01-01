@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { Message, useChat } from "ai/react";
 import { useUserChat } from "@/store/userChat";
-import { useParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import Intro from "@/app/_components/Intro";
 import ChatUI from "@/app/_components/ChatUI";
 import AIInput_10 from "@/app/_components/AiInput";
@@ -31,8 +31,9 @@ export default function Page() {
     reload,
   } = useChat({
     api: "/api/chat",
-    onFinish() {
+    onFinish(message, options) {
       setChatUpdate(true);
+      console.log("onFinish", message, options);
     },
     experimental_throttle: 100,
     id: id as string,
@@ -41,7 +42,6 @@ export default function Page() {
       console.error(error);
     },
     onToolCall({ toolCall }) {
-      console.log("Tool call", toolCall);
       if (toolCall?.toolName === "rememberInformation") {
         const previousMemory = localStorage.getItem("previousMemory");
         let memory: string[] = [];
@@ -54,11 +54,6 @@ export default function Page() {
           "previousMemory",
           JSON.stringify([...memory, ...array])
         );
-
-        console.log(
-          "Tool call",
-          JSON.stringify((toolCall.args as ArgsForMemory).memory)
-        );
       }
       if (toolCall?.toolName === "generateTitle") {
         updateChatTitle(
@@ -67,11 +62,15 @@ export default function Page() {
         );
       }
     },
+    onResponse(response) {
+      console.log("onResponse", response);
+    },
   });
 
   useEffect(() => {
     if (!initializeChat) {
       const chat = getChat(id as string);
+      if (!chat) notFound();
       const messages =
         chat?.messages?.map((message) => ({
           id: message.id,
@@ -117,8 +116,6 @@ export default function Page() {
       setChatUpdate(false);
     }
   }, [messages, chatUpdate, isLoading, addMessage, id, model]);
-
-  console.log("messages", messages);
 
   return (
     <div className="flex-1 flex justify-center">

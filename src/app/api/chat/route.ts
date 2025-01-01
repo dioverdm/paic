@@ -12,7 +12,9 @@ import {
 import { cookies } from "next/headers";
 import crypto from "crypto";
 import { z } from "zod";
-import { JSDOM } from "jsdom";
+import { HackerNewsClient } from "@agentic/hacker-news";
+import { FirecrawlClient } from "@agentic/firecrawl";
+import { BingClient } from "@agentic/bing";
 
 // Helper function to derive a 32-byte key
 const deriveKey = (secret: string): Buffer => {
@@ -163,59 +165,36 @@ Return the title as a single string.`,
         return new Date().toISOString();
       },
     },
-    fetchWebPage: {
-      description: `Safely fetch and extract content from a specified web page URL. DONT USE IT IF THE URL IS NOT PROVIDED
-
-      Guidelines:
-      - Only fetch from valid, public URLs
-      - Strips script, style, and meta tags for cleaner content
-      - Returns parsed HTML content
-      - Uses browser-like User-Agent
-      - Handles errors gracefully
-
-      Do not use for:
-      - Web searching (use webSearch tool instead)
-      - Accessing private/authenticated content
-      - Scraping restricted content`,
+    hackerNews: {
+      description: `Retrieve the top stories from Hacker News. Always give links to the original source.`,
       parameters: z.object({
-        url: z.string().url().describe("The URL to fetch content from"),
+        count: z.number().optional().default(5),
       }),
-      execute: async ({ url }: { url: string }) => {
-        const response = await fetch(url, {
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-          },
-        });
-        if (!response.ok) {
-          return `Failed to fetch: ${response.status}`;
-        }
-        const html = await response.text();
-
-        // Create a DOM parser
-        const dom = new JSDOM(html);
-        const document = dom.window.document;
-
-        // // Remove all script tags
-        // const scripts = document.getElementsByTagName("script");
-        // while (scripts.length > 0) {
-        //   scripts[0].parentNode?.removeChild(scripts[0]);
-        // }
-
-        // Remove all style tags
-        const styles = document.getElementsByTagName("style");
-        while (styles.length > 0) {
-          styles[0].parentNode?.removeChild(styles[0]);
-        }
-
-        // Remove all meta tags
-        const meta = document.getElementsByTagName("meta");
-        while (meta.length > 0) {
-          meta[0].parentNode?.removeChild(meta[0]);
-        }
-
-        // Get the cleaned HTML
-        return document.documentElement.outerHTML;
+      execute: async () => {
+        const hn = new HackerNewsClient();
+        const stories = await hn.getTopStories();
+        return stories;
+      },
+    },
+    calculator: {
+      description: `Perform mathematical calculations. Supports basic arithmetic operations.
+      
+      Guidelines:
+      - Use standard mathematical notation
+      - Supports +, -, *, /, (), and basic math functions
+      - Returns the calculated result
+      Only accepts valid mathematical expressions:
+      - Numbers and decimal points
+      - Basic operators: +, -, *, /
+      - Parentheses ()
+      - No letters or other characters
+      `,
+      parameters: z.object({
+        expr: z.string().describe("The mathematical expression to evaluate"),
+      }),
+      execute: async ({ expr }: { expr: string }) => {
+        const res = eval(expr);
+        return res;
       },
     },
   };
@@ -228,6 +207,8 @@ Return the title as a single string.`,
         cx: string;
       };
     } = JSON.parse(plugins);
+
+    console.log("pluginsArray", pluginsArray);
 
     // Add plugin tools
     const webSearch = {
@@ -258,8 +239,46 @@ Return the title as a single string.`,
       },
     };
 
+    const webScrape = {
+      description: `Scrape content from a web page and return relevant results.`,
+      parameters: z.object({
+        url: z.string().url().describe("The URL to scrape content from"),
+      }),
+      execute: async ({ url }: { url: string }) => {
+        const firecrawl = new FirecrawlClient({
+          apiKey: pluginsArray["firecrawl"].apiKey,
+        });
+        const res = await firecrawl.scrapeUrl({
+          url,
+        });
+        return res;
+      },
+    };
+
+    const bingWebSearch = {
+      description: `Perform a web search using Bing Web Search API and return relevant results.`,
+      parameters: z.object({
+        query: z.string().describe("The search query to execute"),
+      }),
+      execute: async ({ query }: { query: string }) => {
+        const bing = new BingClient({
+          apiKey: pluginsArray["bing-search"].apiKey,
+        });
+        const res = await bing.search(query);
+        return res;
+      },
+    };
+
     if (pluginsArray["google-search"].enabled) {
       tools.webSearch = webSearch;
+    }
+
+    if (pluginsArray["firecrawl"].enabled) {
+      tools.webScrape = webScrape;
+    }
+
+    if (pluginsArray["bing-search"].enabled) {
+      tools.bingWebSearch = bingWebSearch;
     }
   }
 
@@ -302,6 +321,7 @@ Return the title as a single string.`,
           return "An unknown error occurred.";
         }
       },
+      sendUsage: true,
     });
   } catch (error) {
     return new Response((error as Error).message, { status: 500 });
