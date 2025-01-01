@@ -41,7 +41,7 @@ import PluginSettings from "./PluginSettings";
 const data = {
   nav: [
     { name: "Common", icon: Settings },
-    { name: "Models", icon: SparklesIcon },
+    { name: "Providers", icon: SparklesIcon },
     { name: "Plugins", icon: LayoutDashboard },
     { name: "Memory", icon: BrainIcon },
   ],
@@ -108,7 +108,7 @@ export function SettingsDialog({
                 switch (selected) {
                   case "Common":
                     return <CommonSettings />;
-                  case "Models":
+                  case "Providers":
                     return <ModelSettings />;
                   case "Memory":
                     return <MemorySettings />;
