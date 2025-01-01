@@ -83,6 +83,7 @@ export async function POST(req: Request) {
       case "openai":
         return createOpenAI({
           apiKey,
+          compatibility: "strict",
         });
       case "anthropic":
         return createAnthropic({
@@ -92,6 +93,7 @@ export async function POST(req: Request) {
         return createOpenRouter({
           baseURL: "https://openrouter.ai/api/v1",
           apiKey,
+          compatibility: "strict",
         });
       default:
         throw new Error("Invalid AI provider specified");
@@ -125,7 +127,7 @@ export async function POST(req: Request) {
       temperature, // Use temperature from settings
       topP, // Use topP from settings
       maxSteps: 10,
-      tools: provider !== "anthropic" ? tools : {},
+      tools: tools,
       // toolChoice: {}
     });
 
