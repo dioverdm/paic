@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CoffeeIcon, Send } from "lucide-react";
+import { CoffeeIcon, GithubIcon, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -106,6 +106,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: CoffeeIcon,
     },
     {
+      title: "Github",
+      url: "https://github.com/C-W-D-Harshit/lume-ai",
+      icon: GithubIcon,
+    },
+    {
       title: "Feedback",
       url: "mailto:cwd.harshit911@gmail.com",
       icon: Send,
@@ -138,7 +143,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={navMain} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="gap-0">
         <NavSecondary items={navSecondary} className="" />
         <NavUser user={user} />
       </SidebarFooter>
