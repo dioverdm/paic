@@ -97,7 +97,7 @@ const plugins: PluginConfig[] = [
     enabled: false,
     apiKey: "",
     description: "Extract structured data from any website",
-    apiKeyUrl: "https://firecrawl.co/dashboard",
+    apiKeyUrl: "https://www.firecrawl.dev/app/api-keys",
   },
 ];
 
