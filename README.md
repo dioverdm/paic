@@ -1,6 +1,6 @@
 # LumeAI: Cutting-Edge AI-Powered Chat Application
 
-LumeAI is a state-of-the-art chat application built with Next.js 15, featuring multiple AI model support and advanced conversation capabilities.
+LumeAI is a state-of-the-art chat application built with Next.js, featuring multiple AI model support and advanced conversation capabilities.
 
 ![LumeAI Logo](https://www.lumeai.xyz/og.png)
 
