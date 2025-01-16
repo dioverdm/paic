@@ -41,7 +41,7 @@ export const useUserChat = create<ChatState>()(
       chatIndex: {},
       getAllChats: () => get().chat,
       getChat: (id: string) => {
-        return get().chatIndex[id] || get().chat.find((c) => c.id === id);
+        return get().chatIndex[id];
       },
       createChat: async (model: string, messages: ChatMessage[]) => {
         const id = generateId();
@@ -145,6 +145,18 @@ export const useUserChat = create<ChatState>()(
     {
       name: "chat-storage",
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state, self) => {
+        if (state && state.chat) {
+          state.chatIndex = state.chat.reduce(
+            (acc, chat) => ({
+              ...acc,
+              [chat.id]: chat,
+            }),
+            {}
+          );
+          (self as { setState: (state: ChatState) => void })?.setState(state);
+        }
+      },
     }
   )
 );
