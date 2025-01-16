@@ -41,7 +41,7 @@ export const useUserChat = create<ChatState>()(
       chatIndex: {},
       getAllChats: () => get().chat,
       getChat: (id: string) => {
-        return get().chatIndex[id];
+        return get().chatIndex[id] || get().chat.find((c) => c.id === id);
       },
       createChat: async (model: string, messages: ChatMessage[]) => {
         const id = generateId();
