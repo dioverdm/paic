@@ -66,7 +66,7 @@ export default function Page() {
       };
       setTimeout(() => {
         handleChatCreation(messages[1]);
-      }, 1000);
+      }, 100);
       setInitialChatCreation(false);
     }
   }, [createChat, initialChatCreation, isLoading, messages, router, model]);

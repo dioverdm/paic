@@ -16,8 +16,11 @@ type Chat = {
   updatedAt: Date;
 };
 
+type ChatIndex = { [key: string]: Chat };
+
 interface ChatState {
   chat: Chat[];
+  chatIndex: ChatIndex;
   getAllChats: () => Chat[];
   getChat: (id: string) => Chat | undefined;
   createChat: (model: string, messages: ChatMessage[]) => Promise<string>;
@@ -35,10 +38,10 @@ export const useUserChat = create<ChatState>()(
   persist(
     (set, get) => ({
       chat: [],
+      chatIndex: {},
       getAllChats: () => get().chat,
       getChat: (id: string) => {
-        const { chat } = get();
-        return chat.find((chat) => chat.id === id);
+        return get().chatIndex[id];
       },
       createChat: async (model: string, messages: ChatMessage[]) => {
         const id = generateId();
@@ -58,51 +61,85 @@ export const useUserChat = create<ChatState>()(
         if (error) {
           throw new Error(error);
         }
-        set((state) => ({
-          chat: [
-            ...state.chat,
-            {
-              id,
-              title,
-              model,
-              messages,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            },
-          ],
-        }));
+        set((state) => {
+          const newChat = {
+            id,
+            title,
+            model,
+            messages,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          return {
+            chat: [...state.chat, newChat],
+            chatIndex: { ...state.chatIndex, [id]: newChat },
+          };
+        });
         return id;
       },
       updateChat: (id: string, messages: ChatMessage[]) => {
-        set((state) => ({
-          chat: state.chat.map((chat) =>
-            chat.id === id ? { ...chat, messages, updatedAt: new Date() } : chat
-          ),
-        }));
+        set((state) => {
+          const chat = state.chatIndex[id];
+          if (!chat) return state;
+
+          const updatedChat = {
+            ...chat,
+            messages,
+            updatedAt: new Date(),
+          };
+
+          return {
+            chat: state.chat.map((c) => (c.id === id ? updatedChat : c)),
+            chatIndex: { ...state.chatIndex, [id]: updatedChat },
+          };
+        });
       },
       deleteChat: (id: string) => {
-        set((state) => ({
-          chat: state.chat.filter((chat) => chat.id !== id),
-        }));
+        set((state) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [id]: _, ...remainingChats } = state.chatIndex;
+          return {
+            chat: state.chat.filter((c) => c.id !== id),
+            chatIndex: remainingChats,
+          };
+        });
       },
       clearAllChats: () => {
-        set({ chat: [] });
+        set({ chat: [], chatIndex: {} });
       },
       addMessage: (id: string, message: ChatMessage) => {
-        set((state) => ({
-          chat: state.chat.map((chat) =>
-            chat.id === id
-              ? { ...chat, messages: [...chat.messages, message] }
-              : chat
-          ),
-        }));
+        set((state) => {
+          const chat = state.chatIndex[id];
+          if (!chat) return state;
+
+          const updatedChat = {
+            ...chat,
+            messages: [...chat.messages, message],
+            updatedAt: new Date(),
+          };
+
+          return {
+            chat: state.chat.map((c) => (c.id === id ? updatedChat : c)),
+            chatIndex: { ...state.chatIndex, [id]: updatedChat },
+          };
+        });
       },
       updateChatTitle: (id: string, title: string) => {
-        set((state) => ({
-          chat: state.chat.map((chat) =>
-            chat.id === id ? { ...chat, title, updatedAt: new Date() } : chat
-          ),
-        }));
+        set((state) => {
+          const chat = state.chatIndex[id];
+          if (!chat) return state;
+
+          const updatedChat = {
+            ...chat,
+            title,
+            updatedAt: new Date(),
+          };
+
+          return {
+            chat: state.chat.map((c) => (c.id === id ? updatedChat : c)),
+            chatIndex: { ...state.chatIndex, [id]: updatedChat },
+          };
+        });
       },
     }),
     {
